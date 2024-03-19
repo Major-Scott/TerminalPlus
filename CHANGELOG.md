@@ -1,3 +1,11 @@
+## v0.2.2
+- Fixed small problem with the difficulty algorhythm
+- Kilroy is here.
+
+## v0.2.1
+- Actually uploaded the right version this time (hopefully)
+- Kilroy was here.
+
 ## v0.2.0
 - Fixed the empty space below pages
 - Hid clear weather from the catalogue, now a config option
@@ -6,7 +14,7 @@
 - Fixed long weather names breaking the formatting
 - Added "even listing" config option that separates moons into groups of three, regardless of the sorting
 - Fixed some keyword conflicts
-- Kilroy is here.
+- Kilroy was here.
 
 ## v0.1.2
 

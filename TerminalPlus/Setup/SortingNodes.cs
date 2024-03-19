@@ -162,6 +162,11 @@ namespace TerminalPlus
                 else if (x.riskLevel != "Safe" && y.riskLevel == "Safe") return -1;
                 else if (x.riskLevel == "Safe" && y.riskLevel == "Safe") return 0;
 
+                if (x.riskLevel[0] == 'S' && y.riskLevel[0] != 'S') return -1;
+                else if (x.riskLevel[0] != 'S' && y.riskLevel[0] == 'S') return 1;
+                else if (x.riskLevel.Contains("SS") && !y.riskLevel.Contains("SS")) return -1;
+                else if (!x.riskLevel.Contains("SS") && y.riskLevel.Contains("SS")) return 1;
+
                 if (x.riskLevel[0] == y.riskLevel[0])
                 {
 
@@ -171,10 +176,6 @@ namespace TerminalPlus
                     else if (x.riskLevel.Contains('-') && !y.riskLevel.Contains("-")) return 1;
                     else return 0;
                 }
-                if (x.riskLevel[0] == 'S' && y.riskLevel[0] != 'S') return -1;
-                else if (x.riskLevel[0] != 'S' && y.riskLevel[0] == 'S') return 1;
-                else if (x.riskLevel.Contains("SS") && !y.riskLevel.Contains("SS")) return -1;
-                else if (!x.riskLevel.Contains("SS") && y.riskLevel.Contains("SS")) return 1;
 
                 if (x.riskLevel.CompareTo(y.riskLevel) != 0) return x.riskLevel.CompareTo(y.riskLevel);
                 else return 0;
