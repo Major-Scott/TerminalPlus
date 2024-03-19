@@ -9,8 +9,8 @@ namespace TerminalPlus
 {
     public partial class Nodes
     {
-        private static SelectableLevel[] moonsArray = Resources.FindObjectsOfTypeAll<SelectableLevel>();
-        public static List<SelectableLevel> moonsList = moonsArray.ToList();
+        //private static SelectableLevel[] moonsArray = Resources.FindObjectsOfTypeAll<SelectableLevel>();
+        public static List<SelectableLevel> moonsList;
 
         public static int[] moonsPrice;
         public static List<string> moonNames = new List<string>();
@@ -19,21 +19,26 @@ namespace TerminalPlus
         private static string[] displayNames = new string[0];
         private static string[] displayPrefixes = new string[0];
         private static string[] displayGrades = new string[0];
+        private static string[] displayWeather = new string[0];
 
-        public static CompatibleNoun[] routeNouns = Resources.FindObjectsOfTypeAll<TerminalKeyword>().FirstOrDefault((TerminalKeyword w) => w.name == "Route")?.compatibleNouns;
+        public static CompatibleNoun[] routeNouns = new CompatibleNoun[0];
         public static string catalogueSort = "        ID ⇩";
 
         public static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource("TerminalPlus");
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
-        [HarmonyPrefix]
-        [HarmonyPriority(Priority.HigherThanNormal)]
+        [HarmonyPostfix]
+        [HarmonyPriority(100)]
         private static void PatchMoonInfo()
         {
             List<SelectableLevel> errorArray = new List<SelectableLevel>();
+            routeNouns = terminal.terminalNodes.allKeywords[26].compatibleNouns;
+            
+            moonsList = Resources.FindObjectsOfTypeAll<SelectableLevel>().ToList();
 
             foreach (SelectableLevel selectableLevel in moonsList)
             {
+                mls.LogInfo($"Checking level {selectableLevel.PlanetName}'s ID: {selectableLevel.levelID}");
                 if (selectableLevel.levelID < 0)//-----------------------------------------------------confirms IDs
                 {
                     mls.LogInfo("Found ID below zero. Removing...");
@@ -44,6 +49,7 @@ namespace TerminalPlus
 
             foreach (SelectableLevel item in errorArray) { moonsList.Remove(item); }//-----------------fixes arrays
             Array.Resize(ref moonsPrice, moonsList.Count);
+            moonsList.Sort(SortByID);
 
             foreach (SelectableLevel slMatcher in moonsList)
             {
@@ -54,15 +60,15 @@ namespace TerminalPlus
                         moonsPrice[slMatcher.levelID] = compatibleNoun.result.itemCost;
                         mls.LogInfo($"Found price of {slMatcher.PlanetName}: ${moonsPrice[slMatcher.levelID]}");
                     }
+                    
                 }
             }
-            moonsList.Sort(SortByID);
         }
 
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
-        [HarmonyPrefix]
-        [HarmonyPriority(10)]
+        [HarmonyPostfix]
+        [HarmonyPriority(100)]
         public static void NameSeparator()
         {
             moonNames.Clear();
@@ -71,12 +77,14 @@ namespace TerminalPlus
             
             foreach (SelectableLevel selectableLevel in moonsList)
             {
-                string nameTrimmed = selectableLevel.PlanetName.Substring(selectableLevel.PlanetName.IndexOf(' ') + 1);
+                
+                string nameTrimmed = string.Empty;
                 string namePrefix = string.Empty;
-
-                if (selectableLevel.PlanetName.Length > nameTrimmed.Length)
+                if (!char.IsDigit(selectableLevel.PlanetName.First())) nameTrimmed = selectableLevel.PlanetName;
+                else
                 {
-                    namePrefix = selectableLevel.PlanetName.Substring(0, selectableLevel.PlanetName.Length - nameTrimmed.Length - 1);
+                    namePrefix = selectableLevel.PlanetName.Substring(0, selectableLevel.PlanetName.IndexOf(' '));
+                    nameTrimmed = selectableLevel.PlanetName.Substring(selectableLevel.PlanetName.IndexOf(' ') + 1);
                 }
 
                 moonNames.Insert(selectableLevel.levelID, nameTrimmed);
@@ -84,16 +92,16 @@ namespace TerminalPlus
             }
         }
 
-
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(1)]
+        [HarmonyPriority(98)]
         public static void MoonCatalogueSetup()
         {
             mls.LogDebug("SETUP START");
             displayNames = new string[moonsList.Count];
             displayPrefixes = new string[moonsList.Count];
             displayGrades = new string[moonsList.Count];
+            displayWeather = new string[moonsList.Count];
 
             foreach (SelectableLevel slSetup in moonsList)
             {
@@ -110,8 +118,13 @@ namespace TerminalPlus
                 else { displayPrefixes[cID] = displayPrefixes[cID].Length <= 3 ? displayPrefixes[cID].PadLeft(3, ConfigManager.padChar) : displayPrefixes[cID].Substring(0, 3); }
 
                 displayGrades[cID] = displayGrades[cID].Length <= 2 || displayGrades[cID] == "Safe" ? displayGrades[cID].PadRight(3).PadLeft(4) : displayGrades[cID].Substring(0, 2).PadRight(3).PadLeft(4);
-            }
 
+                if (slSetup.currentWeather == LevelWeatherType.None && ConfigManager.showClear) displayWeather[cID] = "Clear";
+                else if (slSetup.currentWeather == LevelWeatherType.None) displayWeather[cID] = string.Empty;
+                else if (slSetup.currentWeather.ToString().Length > 10) displayWeather[cID] = "Complex";
+                else displayWeather[cID] = slSetup.currentWeather.ToString();
+            }
+            
             switch (ConfigManager.defaultSort)
             {
                 case 1:

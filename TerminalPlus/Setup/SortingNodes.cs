@@ -20,7 +20,7 @@ namespace TerminalPlus
         // By Weather: moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
 
         static readonly List<string> nounList = new List<string>();
-        private static readonly Terminal terminal = UnityEngine.Object.FindAnyObjectByType<Terminal>();
+        public static readonly Terminal terminal = UnityEngine.Object.FindAnyObjectByType<Terminal>();
 
         internal static TerminalNode CreateNode()
         {
@@ -51,7 +51,7 @@ namespace TerminalPlus
 
         internal static void CreateSortingNodes()
         {
-            nounList.AddRange(new string[] { "id", "name", "prefix", "grade", "price", "weather", "difficulty", "info", "help", "list" });
+            nounList.AddRange(new string[] { "id", "name", "prefix", "grade", "price", "weather", "difficulty", "info", "help", "list", "current" });
             TerminalKeyword sortKeyword = CreateKeyword();
             TerminalKeyword reverseKeyword = CreateKeyword();
 
@@ -79,14 +79,20 @@ namespace TerminalPlus
                 reverseKeyword.isVerb = true;
                 terminal.terminalNodes.allKeywords = terminal.terminalNodes.allKeywords.AddItem(reverseKeyword).ToArray();
             }
-            sortKeyword.compatibleNouns = new CompatibleNoun[10];
-            reverseKeyword.compatibleNouns = new CompatibleNoun[10];
+            sortKeyword.compatibleNouns = new CompatibleNoun[11];
+            reverseKeyword.compatibleNouns = new CompatibleNoun[11];
 
             for (int i = 0; i < nounList.Count; i++)
             {
                 TerminalKeyword nounKeyword = CreateKeyword();
                 TerminalNode terminalNode = CreateNode();
                 TerminalNode revTerminalNode = CreateNode();
+
+                if (terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == nounList[i]) != null && nounList[i] != "help" && nounList[i] != "info")
+                {
+                    nounKeyword = terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == nounList[i]);
+                }
+
                 nounKeyword.word = nounList[i];
                 nounKeyword.name = $"{nounList[i]}TPsortKeyword";
                 nounKeyword.defaultVerb = sortKeyword;
@@ -104,7 +110,7 @@ namespace TerminalPlus
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(Priority.Last)]
+        [HarmonyPriority(10)]
         public static void CreateNodes()
         {
             CreateSortingNodes();

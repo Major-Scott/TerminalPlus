@@ -62,13 +62,26 @@
     <Reference Include="UnityEngine">
       <HintPath>S:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\AssemblyReferences\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>S:\SteamLibrary\steamapps\common\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\AssemblyReferences\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\AssemblyReferences\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PluginMain.cs" />
     <Compile Include="Screens\HelpInfoPage.cs" />
+    <Compile Include="Screens\iconpage.cs" />
     <Compile Include="Screens\StorePage.cs" />
     <Compile Include="Screens\MoonsPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +92,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /q/y/i "$(TargetPath)" "S:\SteamLibrary\steamapps\common\Lethal Company\r2modman\LethalCompany\profiles\T1\BepInEx\plugins\" /E /H /C</PostBuildEvent>
+    <PostBuildEvent>xcopy /q/y/i "$(TargetPath)" "S:\SteamLibrary\steamapps\common\Lethal Company\r2modman\LethalCompany\profiles\T1\BepInEx\plugins\Slam-TerminalPlus\" /E /H /C
+xcopy /q/y/i "$(TargetPath)" "S:\SteamLibrary\steamapps\common\Lethal Company\r2modman\LethalCompany\profiles\DLT\BepInEx\plugins\Slam-TerminalPlus\" /E /H /C</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GameNetcodeStuff;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -11,16 +12,16 @@ namespace TerminalPlus
     [HarmonyPatch(typeof(Terminal))]
     public class TerminalPatches
     {
-        static string playerSubmit = string.Empty;
+        public static string playerSubmit = string.Empty;
+        public static bool usedTerminal = false;
 
         // EXECUTION ORDER:
-        // 1. PatchMoonInfo - Prefix 500
-        // 2. NameSeparator - Prefix 10
-        // 3. MakeConfig - Prefix 8
-        // 4. ConfigChanges - Prefix 3
-        // 5. MoonCatalogueSetup - Postfix 1
-        // 6. CreateNodes - Postfix 0
-        
+        // 1. PatchMoonInfo
+        // 2. NameSeparator
+        // 3. MakeConfig
+        // 4. MoonCatalogueSetup
+        // 5. CreateNodes
+
         [HarmonyPostfix]
         [HarmonyPatch("ParsePlayerSentence")]
         public static void ParsePatch(Terminal __instance)
@@ -28,16 +29,15 @@ namespace TerminalPlus
             PluginMain.mls.LogDebug("PARSEPLAYER PATCH");
             playerSubmit = __instance.screenText.text.Substring(__instance.screenText.text.Length - __instance.textAdded);
         }
-
         [HarmonyPostfix]
         [HarmonyPriority(Priority.Last)]
         [HarmonyPatch("RunTerminalEvents")]
-        public static void TextPostProcessPrefix(TerminalNode node, Terminal __instance) 
+        public static void TerminalEventPrefix(TerminalNode node, Terminal __instance) 
         {
             string newDisplayText = null;
 
-            if (node.name == "HelpCommands") newDisplayText = new Nodes().MainHelpPage();
-            else if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode" || node.name == "listTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
+            if (node == Nodes.terminal.terminalNodes.specialNodes[13]) newDisplayText = new Nodes().MainHelpPage();
+            else if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
 
             else if (node.name == "MoonsCatalogue" || node.name.Contains("TPsort"))
             {
@@ -71,6 +71,10 @@ namespace TerminalPlus
                         Nodes.moonsList.Sort(Nodes.SortByDifficulty);
                         Nodes.catalogueSort = "DIFFICULTY ⇩";
                         break;
+                    case "list":
+                        break;
+                    case "current":
+                        break;
                     default:
                         break;
                 }
@@ -82,7 +86,7 @@ namespace TerminalPlus
                 }
                 else PluginMain.mls.LogInfo($"not reverse ):");
 
-                newDisplayText = new Nodes().MoonCataloguePage();
+                newDisplayText = new Nodes().MoonsPage();
             }
             else if (node.name == "0_StoreHub") newDisplayText = new Nodes().StorePage(__instance);
 
@@ -90,14 +94,16 @@ namespace TerminalPlus
             {
                 StringBuilder builder = new StringBuilder();
                 builder.Append($"{newDisplayText}\n");
-                
+
                 __instance.screenText.textComponent.enableKerning = false;
-                __instance.screenText.textComponent.wordWrappingRatios = 1;
-                __instance.screenText.textComponent.horizontalAlignment = HorizontalAlignmentOptions.Left;
-                
+                //__instance.screenText.textComponent.wordWrappingRatios = 1;
+                //__instance.screenText.textComponent.horizontalAlignment = HorizontalAlignmentOptions.Left;
+                __instance.inputFieldText.autoSizeTextContainer = true;
+
                 __instance.screenText.text = builder.ToString();
                 __instance.currentText = builder.ToString();
-                __instance.textAdded = 0;
+                //__instance.currentNode.clearPreviousText = true;
+                //__instance.textAdded = 0;
             }
             return;
         }

@@ -21,15 +21,13 @@ namespace TerminalPlus
             storeItems.OrderBy(x => x.itemName);
             StringBuilder pageChart = new StringBuilder();
 
-            pageChart.AppendLine(@"                                                   ");
-            pageChart.AppendLine(@"                                                   ");
-            pageChart.AppendLine(@"  ╔═══════════════════════════════════════════════╗");
+            pageChart.AppendLine("\n\n  ╔═══════════════════════════════════════════════╗");
             pageChart.AppendLine(@"  ║ ♥-  ╔╦╗╗╔╔╗  ╔╗╔╗╦╦╗╔╗╔╗╦╗╗╔  ╔╗╔╦╗╔╗╦╗╔╗  -♣ ║");
             pageChart.AppendLine(@"  ║ |    ║ ╠╣╠   ║ ║║║║║╠╝╠╣║║╠╝  ╚╗ ║ ║║║╣╠    | ║");
             pageChart.AppendLine(@"  ║ ♠-   ╩ ╝╚╚╝  ╚╝╚╝╩ ╩╩ ╩╩╩╚╚   ╚╝ ╩ ╚╝╩╚╚╝  -♦ ║");
             pageChart.AppendLine(@"  ╠══════════════════════╦═══════╦═════╦══════════╣");
             pageChart.AppendLine(@"  ║<cspace=4.3>  </cspace> ITEM/UNLOCKABLE <cspace=4.3>  </cspace>║ PRICE <cspace=-4.2>║ </cspace>SALE<cspace=-4.3> ║</cspace>  STATUS  ║");
-            pageChart.AppendLine(@"  ╠══════════════════════╩═══════╩═════╩══════════╣");
+            pageChart.AppendLine("  ╠══════════════════════╩═══════╩═════╩══════════╣");
 
             foreach (var item in storeItems)
             {
@@ -53,7 +51,7 @@ namespace TerminalPlus
 
                 pageChart.AppendLine($"  ║ {item.itemName} |<cspace=-2> $</cspace>{itemPrice,-4}<cspace=-0.6> |</cspace> {itemSale} | {displayNumOnShip} ║");
             }
-            pageChart.AppendLine(@"  ╠═══════════════════════════════════════════════╣"); //╠═══════════════════╬═══════╬══════╬════════════╣
+            pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣"); //╠═══════════════════╬═══════╬══════╬════════════╣
 
             storeShipUpgrades.OrderBy(x => x.unlockableName).ToList();
             Dictionary<string, string> defaultUpgrades = new Dictionary<string, string>()
@@ -89,7 +87,7 @@ namespace TerminalPlus
                     pageChart.AppendLine($"  ║ {upgradeName} |<cspace=-2> $</cspace>{upgradePrice}<cspace=-0.6> |</cspace>     |          ║");
                 }
             }
-            pageChart.AppendLine(@"  ╠═══════════════════════════════════════════════╣");
+            pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣");
 
             foreach (TerminalNode decoration in storeDecorations)
             {
@@ -105,7 +103,7 @@ namespace TerminalPlus
                     pageChart.AppendLine($"  ║ {decoration.creatureName} |<cspace=-2> $</cspace>{decoration.itemCost,-4}<cspace=-0.6> |</cspace>     |          ║");
                 }
             }
-            pageChart.AppendLine(@"  ╚═══════════════════════════════════════════════╝");
+            pageChart.AppendLine("  ╚═══════════════════════════════════════════════╝");
 
             return pageChart.ToString();
         }

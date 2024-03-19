@@ -19,6 +19,8 @@ namespace TerminalPlus
         public static int defaultSort;
         public static bool activeKilroy = false;
         public static bool hiddenCompany = true;
+        public static bool showClear = false;
+        public static bool evenListing = false;
         public static SelectableLevel companyLocation;
 
         static ConfigEntry<bool> enableCustom;
@@ -26,6 +28,8 @@ namespace TerminalPlus
         static ConfigEntry<bool> padPrefixes;
         static ConfigEntry<sortingOptions> defaultSorting;
         static ConfigEntry<bool> hideCompany;
+        static ConfigEntry<bool> weatherNone;
+        static ConfigEntry<bool> evenSort;
         static ConfigEntry<bool> configKilroy;
         
         static ConfigEntry<string> setCustomName;
@@ -36,13 +40,12 @@ namespace TerminalPlus
         static ConfigEntry<string> setCustomDescription;
         static ConfigEntry<string> setCustomInfo;
 
-
         [HarmonyPatch(typeof(RoundManager), "Start")]
-        [HarmonyPrefix]
-        [HarmonyPriority(8)]
+        [HarmonyPostfix]
+        [HarmonyPriority(99)]
         public static void MakeConfig()
         {
-            ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource("TerminalPlus");
+            ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource("Slam.TerminalPlus");
             mls.LogDebug("CONFIG START");
 
             TerminalNode[] confirmNodes = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode k) => k.buyRerouteToMoon >= 0).ToArray();
@@ -57,15 +60,33 @@ namespace TerminalPlus
                 "Hides \"71 Gordion\" (The Company Building) from the Moon Catalogue page.");
             padPrefixes = configFile.Bind("00. General", "Pad Prefixes", false,
                 "Pads all prefixes with zeros to be the same length (e.g. \"7 Dine\" would become \"007 Dine\").");
+            weatherNone = configFile.Bind("00. General", "Show Clear Weather", false,
+                "Adds \"(Clear)\" to the weather column of the moon catalogue when the moon has no weather.");
+            evenSort = configFile.Bind("00. General", "Uniform Catalogue Listing", false,
+                "Sorts all moons into groups of three, regardless of current sorting.");
             string settingEntryNum;
 
             foreach (SelectableLevel selectableLevel in Nodes.moonsList)
             {
                 int cuID = selectableLevel.levelID;
+                int saveID = -1;
+                string tempInfo = "PLACEHOLDER TEXT (could not add info text to config, but the setting should still work)";
                 if (cuID < 9) { settingEntryNum = $"0{cuID + 1}"; }
                 else { settingEntryNum = $"{cuID + 1}"; }
                 if (int.TryParse(Nodes.moonPrefixes[cuID], out int tempPrefix)) { }
                 else tempPrefix = -1;
+
+                for (int i = 0; i < infoNodes.Length; i++)
+                {
+                    if (infoNodes[i].displayText.StartsWith(selectableLevel.PlanetName) ||
+                        infoNodes[i].displayText.Contains($"{Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]}") ||
+                        infoNodes[i].name.ToLower().Contains(Nodes.moonNames[cuID].ToLower()))
+                    {
+                        tempInfo = infoNodes[i].displayText;
+                        saveID = i;
+                        break;
+                    }
+                }
 
                 enableCustom = configFile.Bind($"{settingEntryNum}. {selectableLevel.PlanetName} Settings",
                     $"{selectableLevel.PlanetName} - Enable Moon Config", false, $"Enables the customization options below for {selectableLevel.PlanetName}.");
@@ -86,18 +107,11 @@ namespace TerminalPlus
                     $"{selectableLevel.PlanetName} - Set Custom Description", selectableLevel.LevelDescription, "Set a custom description (i.e. the \"POPULATION\", \"CONDITIONS\", and \"FAUNA\" subtext).");
 
                 setCustomInfo = configFile.Bind($"{settingEntryNum}. {selectableLevel.PlanetName} Settings",
-                    $"{selectableLevel.PlanetName} - Set Custom Info Panel", "placeholder (I tried my darndest to get the default here, changing it should still work)", "Set custom info display text (for when you enter \"[moon name] info\" into the terminal)\n(NOTE: may not work on modded moons depending on their default formatting).");
+                    $"{selectableLevel.PlanetName} - Set Custom Info Panel", tempInfo, "Set custom info display text (for when you enter \"[moon name] info\" into the terminal)\n(NOTE: may not work on modded moons depending on their default formatting).");
 
                 if (enableCustom.Value)
                 {
-                    foreach (TerminalNode infoNode in infoNodes)
-                    {
-                        if (infoNode.displayText.StartsWith(selectableLevel.PlanetName) ||
-                            infoNode.displayText.Contains($"{Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]}") ||
-                            infoNode.name.ToLower().Contains(Nodes.moonNames[cuID].ToLower()))
-                            infoNode.displayText = setCustomInfo.Value;
-                    }
-
+                    if (saveID >= 0) infoNodes[saveID].displayText = setCustomInfo.Value;
 
                     mls.LogInfo($"Config enabled for {selectableLevel.PlanetName}. Running...");
 
@@ -136,6 +150,8 @@ namespace TerminalPlus
             defaultSort = (int)defaultSorting.Value;
             activeKilroy = configKilroy.Value;
             hiddenCompany = hideCompany.Value;
+            showClear = weatherNone.Value;
+            evenListing = evenSort.Value;
             mls.LogInfo($"Default sorting method: {defaultSorting.Value}");
             mls.LogDebug("CONFIG END");
         }
