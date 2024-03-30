@@ -7,26 +7,24 @@ using UnityEngine;
 
 namespace TerminalPlus
 {
-    partial class Nodes
+    public partial class Nodes
     {
-        //TERMINAL WIDTH: 51 for some reason & also off-center. padleft 3 for centered and width = 48
-        //planetNameWidth = 20;  //prefix is added 4, longest is "041 Experimentation" 20 total
-        //planetWeatherWidth = 10; //longest it would be is 10: "(Eclipsed)"
+        readonly string symDollar2 = "<space=0.256em><size=92%><voffset=0.72><rotate=-90><space=-0.39em>▲</rotate></voffset><size=74%><voffset=0.54><space=-0.6em>■</voffset></size></size><space=0.19em>";
+        //readonly string symDollar3 = "<voffset=-0.6><size=86%>▘</size></voffset>";
         public string MoonsPage()
         {
             StringBuilder pageChart = new StringBuilder();
 
             if (ConfigManager.activeKilroy)
             {
-                pageChart.AppendLine(@"                                         _____     ");
-                pageChart.AppendLine(@"                                        | . . |    ");
-                pageChart.AppendLine(@"  ╔═══════════════════════════════════ooO═| |═Ooo═╗");
+                pageChart.AppendLine("<line-height=100%>                                         _____     ");
+                pageChart.AppendLine("                                        | . . |    ");
+                pageChart.AppendLine("  ╔═══════════════════════════════════ooO═| |═Ooo═╗");
                 pageChart.AppendLine(@"  ║ ╦╦╗╔╗╔╗╦╗  ╔╗╔╗╔╦╗╔╗╦ ╔╗╔╗╦╦╔╗        ╰—╯     ║");
             }
             else
             {
-                pageChart.AppendLine(@"                                                   ");
-                pageChart.AppendLine(@"                                                   ");
+                pageChart.AppendLine("<line-height=100%>\n                                                   ");
                 pageChart.AppendLine(@"  ╔═══════════════════════════════════════════════╗");
                 pageChart.AppendLine(@"  ║ ╦╦╗╔╗╔╗╦╗  ╔╗╔╗╔╦╗╔╗╦ ╔╗╔╗╦╦╔╗                ║");
             }
@@ -35,6 +33,7 @@ namespace TerminalPlus
             pageChart.AppendLine(@"  ╠═════════════════════╦════╦═══════╦════════════╣");
             pageChart.AppendLine(@"  ║    MOON REGISTRY    ║ GD ║ PRICE ║<cspace=0.85>  WEATHER  </cspace>║");
             pageChart.AppendLine(@"  ╠═════════════════════╩════╩═══════╩════════════╣");
+
             int counter = 0;
             bool firstNode = true;
             SelectableLevel sortRef = ScriptableObject.CreateInstance<SelectableLevel>();
@@ -43,16 +42,16 @@ namespace TerminalPlus
             {
                 if (ConfigManager.hiddenCompany && selectableLevel.name == "CompanyBuildingLevel") continue;
 
-                if (!ConfigManager.evenListing && catalogueSort == "     GRADE ⇩" && !firstNode && selectableLevel.riskLevel[0] != sortRef.riskLevel[0]) { }
-                else if (!ConfigManager.evenListing && catalogueSort == "     PRICE ⇩" && !firstNode && (Math.Abs(moonsPrice[selectableLevel.levelID] - moonsPrice[sortRef.levelID]) > 400)) { }
-                else if (!ConfigManager.evenListing && catalogueSort == "   WEATHER ⇩" && !firstNode && selectableLevel.currentWeather != sortRef.currentWeather) { }
+                if (!ConfigManager.evenSort && catalogueSort == "     GRADE ⇩" && !firstNode && selectableLevel.riskLevel[0] != sortRef.riskLevel[0]) { }
+                else if (!ConfigManager.evenSort && catalogueSort == "     PRICE ⇩" && !firstNode && (Math.Abs(moonsPrice[selectableLevel.levelID] - moonsPrice[sortRef.levelID]) > 400)) { }
+                else if (!ConfigManager.evenSort && catalogueSort == "   WEATHER ⇩" && !firstNode && selectableLevel.currentWeather != sortRef.currentWeather) { }
                 else if (counter >= 3) { }
                 else
                 {
-                    pageChart.AppendLine($"  ║ {displayPrefixes[selectableLevel.levelID]} {displayNames[selectableLevel.levelID]} |" +
-                    $"{displayGrades[selectableLevel.levelID]}|" +
-                    $"<cspace=-1> $</cspace>{moonsPrice[selectableLevel.levelID],-4}<cspace=-0.8> |</cspace> " +
-                    displayWeather[selectableLevel.levelID].PadRight(10) + "<cspace=-1> ║</cspace>");
+                    pageChart.AppendLine($"  ║ {displayPrefixes[selectableLevel.levelID]} {displayNames[selectableLevel.levelID]} |{displayGrades[selectableLevel.levelID]}|" +
+                    $" {symDollar2}{moonsPrice[selectableLevel.levelID],-4} | {displayWeather[selectableLevel.levelID],-10} ║");
+                    if (halfWeather[selectableLevel.levelID] != string.Empty) pageChart.AppendLine($"  ╠                     |    |       | {halfWeather[selectableLevel.levelID],-10} ╣");
+
                     sortRef = selectableLevel;
                     firstNode = false;
                     counter++;
@@ -61,19 +60,19 @@ namespace TerminalPlus
 
                 pageChart.AppendLine("  ╠-----—---------------|----|-------|------------╣");
 
-                pageChart.AppendLine($"  ║ {displayPrefixes[selectableLevel.levelID]} {displayNames[selectableLevel.levelID]} |" +
-                    $"{displayGrades[selectableLevel.levelID]}|" +
-                    $"<cspace=-1> $</cspace>{moonsPrice[selectableLevel.levelID],-4}<cspace=-0.8> |</cspace> " +
-                    displayWeather[selectableLevel.levelID].PadRight(10) + "<cspace=-1> ║</cspace>");
+                pageChart.AppendLine($"  ║ {displayPrefixes[selectableLevel.levelID]} {displayNames[selectableLevel.levelID]} |{displayGrades[selectableLevel.levelID]}|" +
+                    $" {symDollar2}{moonsPrice[selectableLevel.levelID],-4} | {displayWeather[selectableLevel.levelID],-10} ║");
+                if (halfWeather[selectableLevel.levelID] != string.Empty) pageChart.AppendLine($"  ╠                     |    |       | {halfWeather[selectableLevel.levelID],-10} ╣");
+
                 counter = 1;
                 sortRef = selectableLevel;
             }
+
             pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣");
             pageChart.AppendLine($"  ║    The Company is currently buying at {((int)(StartOfRound.Instance.companyBuyingRate * 100)).ToString() + "%",-5}   ║");
             pageChart.AppendLine("  ╚═══════════════════════════════════════════════╝");
 
             return pageChart.ToString();
         }
-
     }
 }

@@ -10,7 +10,6 @@ namespace TerminalPlus
 {
     partial class Nodes
     {
-
         public string StorePage(Terminal terminal)
         {
             var instanceOnShip = GameObject.Find("/Environment/HangarShip").GetComponentsInChildren<GrabbableObject>().ToList();
@@ -26,13 +25,12 @@ namespace TerminalPlus
             pageChart.AppendLine(@"  ║ |    ║ ╠╣╠   ║ ║║║║║╠╝╠╣║║╠╝  ╚╗ ║ ║║║╣╠    | ║");
             pageChart.AppendLine(@"  ║ ♠-   ╩ ╝╚╚╝  ╚╝╚╝╩ ╩╩ ╩╩╩╚╚   ╚╝ ╩ ╚╝╩╚╚╝  -♦ ║");
             pageChart.AppendLine(@"  ╠══════════════════════╦═══════╦═════╦══════════╣");
-            pageChart.AppendLine(@"  ║<cspace=4.3>  </cspace> ITEM/UNLOCKABLE <cspace=4.3>  </cspace>║ PRICE <cspace=-4.2>║ </cspace>SALE<cspace=-4.3> ║</cspace>  STATUS  ║");
-            pageChart.AppendLine("  ╠══════════════════════╩═══════╩═════╩══════════╣");
-
+            pageChart.AppendLine(@"  ║   <space=0.265en>ITEM/UNLOCKABLE<space=0.265en>   ║ PRICE ║<space=0.265en>SALE<space=0.265en>║  STATUS  ║");
+            pageChart.AppendLine(@"  ╠══════════════════════╩═══════╩═════╩══════════╣");
             foreach (var item in storeItems)
             {
                 if (terminal.buyableItemsList.ToList().IndexOf(item) < 0) continue;
-                item.itemName = item.itemName.Length > 20 ? item.itemName.Substring(0, 17) + "..." : item.itemName.PadRight(20);
+                string cName = item.itemName.Length > 20 ? item.itemName.Substring(0, 17) + "..." : item.itemName.PadRight(20);
 
                 int percentSale = terminal.itemSalesPercentages[terminal.buyableItemsList.ToList().IndexOf(item)];
                 string itemSale = $"{100 - percentSale}%".PadLeft(3);
@@ -49,7 +47,7 @@ namespace TerminalPlus
                 else if (numOnShip < 10) displayNumOnShip = numOnShip.ToString().PadLeft(2, '0') + " Owned";
                 else displayNumOnShip = numOnShip.ToString().PadRight(2) + " Owned";
 
-                pageChart.AppendLine($"  ║ {item.itemName} |<cspace=-2> $</cspace>{itemPrice,-4}<cspace=-0.6> |</cspace> {itemSale} | {displayNumOnShip} ║");
+                pageChart.AppendLine($"  ║ {cName} |<cspace=-2> $</cspace>{itemPrice,-4}<cspace=-0.6> |</cspace> {itemSale} | {displayNumOnShip} ║");
             }
             pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣"); //╠═══════════════════╬═══════╬══════╬════════════╣
 

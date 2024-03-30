@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using HarmonyLib;
 using UnityEngine;
@@ -19,8 +20,18 @@ namespace TerminalPlus
         // By Price: moonsList.Sort((x, y) => moonsPrice[x.levelID].CompareTo(moonsPrice[y.levelID]));
         // By Weather: moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
 
-        static readonly List<string> nounList = new List<string>();
         public static readonly Terminal terminal = UnityEngine.Object.FindAnyObjectByType<Terminal>();
+        private static string[] nounTPList = new string[0];
+
+        public static int dayPowerMult = 0;
+        public static int nightPowerMult = 0;
+        public static int insidePowerMult = 0;
+        public static int dayCountMult = 0;
+        public static int nightCountMult = 0;
+        public static int insideCountMult = 0;
+        public static int sizeMult = 0;
+        public static int valueMult = 0;
+        public static int weatherMult = 0;
 
         internal static TerminalNode CreateNode()
         {
@@ -38,7 +49,7 @@ namespace TerminalPlus
 
             terminalNode.playSyncedClip = -1;
             terminalNode.terminalEvent = string.Empty;
-            terminalNode.terminalOptions = new CompatibleNoun[0];
+            //terminalNode.terminalOptions = new CompatibleNoun[0];
 
             return terminalNode;
         }
@@ -51,9 +62,12 @@ namespace TerminalPlus
 
         internal static void CreateSortingNodes()
         {
-            nounList.AddRange(new string[] { "id", "name", "prefix", "grade", "price", "weather", "difficulty", "info", "help", "list", "current" });
+            mls.LogDebug("Start of CREATESORTNODES: " + nounTPList.Length);
+            
+            nounTPList = new string[12]{ "default", "id", "name", "prefix", "grade", "price", "weather", "difficulty", "info", "help", "list", "current" };
             TerminalKeyword sortKeyword = CreateKeyword();
             TerminalKeyword reverseKeyword = CreateKeyword();
+            mls.LogDebug("created sort and reverse");
 
             if (terminal.terminalNodes.allKeywords.FirstOrDefault(keyword => keyword.word == "sort" || keyword.name == "sortKeyword") != null)
             {
@@ -79,33 +93,43 @@ namespace TerminalPlus
                 reverseKeyword.isVerb = true;
                 terminal.terminalNodes.allKeywords = terminal.terminalNodes.allKeywords.AddItem(reverseKeyword).ToArray();
             }
-            sortKeyword.compatibleNouns = new CompatibleNoun[11];
-            reverseKeyword.compatibleNouns = new CompatibleNoun[11];
-
-            for (int i = 0; i < nounList.Count; i++)
+            sortKeyword.compatibleNouns = new CompatibleNoun[12];
+            reverseKeyword.compatibleNouns = new CompatibleNoun[12];
+            mls.LogDebug("TOTAL NOUN COUNT (should be 12): " + nounTPList.Length);
+            for (int i = 0; i < nounTPList.Length; i++)
             {
                 TerminalKeyword nounKeyword = CreateKeyword();
                 TerminalNode terminalNode = CreateNode();
                 TerminalNode revTerminalNode = CreateNode();
-
-                if (terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == nounList[i]) != null && nounList[i] != "help" && nounList[i] != "info")
+                if (terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == nounTPList[i]) != null && nounTPList[i] != "help" && nounTPList[i] != "info")
                 {
-                    nounKeyword = terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == nounList[i]);
+                    nounKeyword = terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == nounTPList[i]);
                 }
-
-                nounKeyword.word = nounList[i];
-                nounKeyword.name = $"{nounList[i]}TPsortKeyword";
+                nounKeyword.word = nounTPList[i];
+                nounKeyword.name = $"{nounTPList[i]}TPsortKeyword";
                 nounKeyword.defaultVerb = sortKeyword;
                 terminal.terminalNodes.allKeywords = terminal.terminalNodes.allKeywords.AddItem(nounKeyword).ToArray();
                 terminalNode.terminalEvent = nounKeyword.word;
-                terminalNode.name = $"{nounList[i]}TPsortNode";
+                terminalNode.name = $"{nounTPList[i]}TPsortNode";
                 CompatibleNoun compatibleNoun = new CompatibleNoun();
                 compatibleNoun.noun = nounKeyword;
                 compatibleNoun.result = terminalNode;
                 sortKeyword.compatibleNouns[i] = compatibleNoun;
                 reverseKeyword.compatibleNouns[i] = compatibleNoun;
+                if (nounTPList[i] == "default")
+                {
+                    mls.LogWarning("in sort noun");
+                    
+                }
+                if (nounTPList[i] == "current")
+                {
+                    mls.LogWarning("in reverse noun");
+                    CompatibleNoun sortNoun = new CompatibleNoun { noun = sortKeyword, result = terminalNode };
+                    sortNoun.noun.specialKeywordResult = terminalNode;
+                    CompatibleNoun reverseNoun = new CompatibleNoun { noun = reverseKeyword, result = terminalNode };
+                    reverseNoun.noun.specialKeywordResult = terminalNode;
+                }
             }
-
         }
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
@@ -113,6 +137,21 @@ namespace TerminalPlus
         [HarmonyPriority(10)]
         public static void CreateNodes()
         {
+            TerminalKeyword shipKeyword = CreateKeyword();
+            TerminalNode shipNode = CreateNode();
+            if (terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == "ship") != null)
+            {
+                shipKeyword = terminal.terminalNodes.allKeywords.FirstOrDefault(keynoun => keynoun.word == "ship");
+            }
+            shipKeyword.word = "ship";
+            shipKeyword.name = "scanShipKeyword";
+            shipKeyword.defaultVerb = terminal.terminalNodes.allKeywords[73];
+            terminal.terminalNodes.allKeywords = terminal.terminalNodes.allKeywords.AddItem(shipKeyword).ToArray();
+            shipNode.terminalEvent = shipKeyword.word;
+            shipNode.name = "scanShipNode";
+            CompatibleNoun shipNoun = new CompatibleNoun { noun = shipKeyword, result = shipNode };
+            terminal.terminalNodes.allKeywords[73].isVerb = true;
+            terminal.terminalNodes.allKeywords[73].compatibleNouns = terminal.terminalNodes.allKeywords[73].compatibleNouns.AddItem(shipNoun).ToArray();
             CreateSortingNodes();
         }
 
@@ -192,20 +231,24 @@ namespace TerminalPlus
                 if (x.riskLevel == "Safe" && y.riskLevel != "Safe") return 1;
                 else if (x.riskLevel != "Safe" && y.riskLevel == "Safe") return -1;
 
-                float xDif = 2 * x.maxDaytimeEnemyPowerCount + 4 * x.maxOutsideEnemyPowerCount + 5 * x.maxEnemyPowerCount * x.factorySizeMultiplier + 
-                    5 * ((int)x.currentWeather + 2);
-                float yDif = 2 * y.maxDaytimeEnemyPowerCount + 4 * y.maxOutsideEnemyPowerCount + 5 * y.maxEnemyPowerCount * y.factorySizeMultiplier +
-                    5 * ((int)y.currentWeather + 2);
+                float xDiff = x.maxDaytimeEnemyPowerCount*dayPowerMult + x.maxOutsideEnemyPowerCount*nightPowerMult + x.maxEnemyPowerCount*insidePowerMult + 
+                    x.DaytimeEnemies.Count*dayCountMult + x.OutsideEnemies.Count*nightCountMult + x.Enemies.Count*insideCountMult +
+                    x.factorySizeMultiplier*sizeMult + ((int)x.currentWeather + 1)*weatherMult + ((x.minTotalScrapValue + x.maxTotalScrapValue)/2)*valueMult;
 
-                if (x.currentWeather == LevelWeatherType.Eclipsed) xDif = xDif + 2 * x.maxOutsideEnemyPowerCount;
-                if (y.currentWeather == LevelWeatherType.Eclipsed) yDif = yDif + 2 * y.maxOutsideEnemyPowerCount;
+                float yDiff = y.maxDaytimeEnemyPowerCount * dayPowerMult + y.maxOutsideEnemyPowerCount * nightPowerMult + y.maxEnemyPowerCount * insidePowerMult +
+                    y.DaytimeEnemies.Count * dayCountMult + y.OutsideEnemies.Count * nightCountMult + y.Enemies.Count * insideCountMult +
+                    y.factorySizeMultiplier * sizeMult + ((int)y.currentWeather + 1) * weatherMult + ((y.minTotalScrapValue + y.maxTotalScrapValue) / 2) * valueMult;
 
-                //manualLogSource.LogMessage($"X: {x.PlanetName}, TOTAL DIFFICULTY: {xDif}");
-                //manualLogSource.LogMessage($"Y: {y.PlanetName}, TOTAL DIFFICULTY: {yDif}");
-                //manualLogSource.LogMessage($"RESULT Y-X: {xDif.CompareTo(yDif)}");
-                //manualLogSource.LogMessage("-----------------------------------------------------------------");
+                //mls.LogMessage($"X: {x.PlanetName}, TOTAL DIFFICULTY: {xDiff}");
+                //mls.LogMessage($"Y: {y.PlanetName}, TOTAL DIFFICULTY: {yDiff}");
+                //mls.LogMessage($"X TOT ENEMIES: {x.maxDaytimeEnemyPowerCount+x.maxOutsideEnemyPowerCount+x.maxEnemyPowerCount}");
+                //mls.LogMessage($"Y TOT ENEMIES: {y.maxDaytimeEnemyPowerCount + y.maxOutsideEnemyPowerCount + y.maxEnemyPowerCount}");
+                //mls.LogMessage($"X WEATHER: {(int)x.currentWeather + 1}  -  X SIZE: {x.factorySizeMultiplier}");
+                //mls.LogMessage($"Y WEATHER: {(int)y.currentWeather + 1}  -  Y SIZE: {y.factorySizeMultiplier}");
 
-                int retval = yDif.CompareTo(xDif);
+                //mls.LogMessage("-----------------------------------------------------------------");
+
+                int retval = yDiff.CompareTo(xDiff);
                 if (retval != 0) return retval;
                 else return 0;
             }

@@ -1,0 +1,153 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|c:\\users\\beige man\\desktop\\lc testing\\terminalplus\\terminalplus\\setup\\configmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\setup\\configmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\screens\\scanmoonpage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\screens\\scanmoonpage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\screens\\routepage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\screens\\routepage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\screens\\moonspage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\screens\\moonspage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\setup\\sortingnodes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\setup\\sortingnodes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\screens\\storepage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\screens\\storepage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\terminalpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\terminalpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\terminalplus\\screens\\scanshippage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{649DF9D8-4A43-40C9-9BC6-ED098CB5ED6E}|TerminalPlus\\TerminalPlus.csproj|solutionrelative:terminalplus\\screens\\scanshippage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SortingNodes.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Setup\\SortingNodes.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Setup\\SortingNodes.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Setup\\SortingNodes.cs",
+              "RelativeToolTip": "TerminalPlus\\Setup\\SortingNodes.cs",
+              "ViewState": "AQIAAGYAAAAAAAAAAAAAAF8AAAA/AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-30T08:05:27.697Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ConfigManager.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Setup\\ConfigManager.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Setup\\ConfigManager.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Setup\\ConfigManager.cs",
+              "RelativeToolTip": "TerminalPlus\\Setup\\ConfigManager.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAApAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-17T03:28:55.948Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TerminalPatch.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\TerminalPatch.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\TerminalPatch.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\TerminalPatch.cs",
+              "RelativeToolTip": "TerminalPlus\\TerminalPatch.cs",
+              "ViewState": "AQIAADgAAAAAAAAAAAAnwEwAAAA9AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-16T03:43:24.857Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MoonsPage.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\MoonsPage.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Screens\\MoonsPage.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\MoonsPage.cs",
+              "RelativeToolTip": "TerminalPlus\\Screens\\MoonsPage.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAKAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-29T19:03:43.947Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ScanShipPage.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\ScanShipPage.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Screens\\ScanShipPage.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\ScanShipPage.cs",
+              "RelativeToolTip": "TerminalPlus\\Screens\\ScanShipPage.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACcAAAA7AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-29T11:56:45.096Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "StorePage.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\StorePage.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Screens\\StorePage.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\StorePage.cs",
+              "RelativeToolTip": "TerminalPlus\\Screens\\StorePage.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAAABsAAACBAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-29T18:24:56.425Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ScanMoonPage.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\ScanMoonPage.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Screens\\ScanMoonPage.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\ScanMoonPage.cs",
+              "RelativeToolTip": "TerminalPlus\\Screens\\ScanMoonPage.cs",
+              "ViewState": "AQIAAE8AAAAAAAAAAAAnwC8AAABLAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-25T13:10:08.245Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RoutePage.cs",
+              "DocumentMoniker": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\RoutePage.cs",
+              "RelativeDocumentMoniker": "TerminalPlus\\Screens\\RoutePage.cs",
+              "ToolTip": "C:\\Users\\Beige Man\\Desktop\\LC Testing\\TerminalPlus\\TerminalPlus\\Screens\\RoutePage.cs",
+              "RelativeToolTip": "TerminalPlus\\Screens\\RoutePage.cs",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAAACQAAAA2AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-29T08:38:23.147Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
