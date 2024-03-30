@@ -1,7 +1,7 @@
 {
     "name": "TerminalPlus",
     "description": "Overhauled terminal with moon customization and sorting",
-    "version_number": "0.2.0",
+    "version_number": "1.0.0",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100"
     ],
