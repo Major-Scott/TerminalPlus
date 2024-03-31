@@ -57,7 +57,7 @@ namespace TerminalPlus
                 { "Teleporter", "375 " },
                 { "Signal translator", "255 " },
                 { "Loud horn", "100 " },
-                { "Inverse Teleporter", "425 " },
+                { "Inverse Teleporter", "425 " }
             };
 
             foreach (UnlockableItem upgrade in storeShipUpgrades)

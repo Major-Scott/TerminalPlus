@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using BepInEx.Bootstrap;
 using BepInEx.Logging;
 using HarmonyLib;
+using LethalLevelLoader;
 using UnityEngine;
 
 namespace TerminalPlus
@@ -11,19 +14,18 @@ namespace TerminalPlus
     partial class Nodes
     {
         public static bool[] priceOverride;
+        private static string[] displayWeather = new string[0];
+        private static string[] halfWeather = new string[0];
+        internal static string[] fullWeather = new string[0];
 
         [HarmonyPatch(typeof(TimeOfDay), "OnDayChanged")]
         [HarmonyPostfix]
         public static void TermUpdate()
         {
-            halfWeather = new string[moonsList.Count];
-
             mls.LogInfo("Updating Moon Catalogue...");
             foreach (SelectableLevel slUpdate in moonsList)
             {
-                string cWeather = slUpdate.currentWeather.ToString();
-                mls.LogMessage($"current moon: {slUpdate.PlanetName}");
-                halfWeather[slUpdate.levelID] = string.Empty;
+                mls.LogInfo($"current moon: {slUpdate.PlanetName}");
 
                 if (priceOverride[slUpdate.levelID] == true)
                 {
@@ -31,26 +33,65 @@ namespace TerminalPlus
                     //moonsPrice[slUpdate.levelID] = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode k) => k.buyRerouteToMoon == slUpdate.levelID).FirstOrDefault().itemCost;
                     moonsPrice[slUpdate.levelID] = Resources.FindObjectsOfTypeAll<TerminalNode>().FirstOrDefault((TerminalNode k) => k.buyRerouteToMoon == slUpdate.levelID).itemCost;
                 }
+                UpdateMoonWeather();
+            }
+        }
 
-                if (slUpdate.currentWeather == LevelWeatherType.None && ConfigManager.showClear) displayWeather[slUpdate.levelID] = "Clear";
-                else if (slUpdate.currentWeather == LevelWeatherType.None) displayWeather[slUpdate.levelID] = string.Empty;
-                else if (cWeather.Length > 10 && !ConfigManager.longWeather) displayWeather[slUpdate.levelID] = "Complex";
+        public static void UpdateMoonWeather()
+        {
+            halfWeather = new string[moonsList.Count];
+            displayWeather = new string[moonsList.Count];
+            fullWeather = new string[moonsList.Count];
+
+            foreach (SelectableLevel sl in  moonsList)
+            {
+                string cWeather = sl.currentWeather.ToString();
+                halfWeather[sl.levelID] = string.Empty;
+
+                if (PluginMain.LLLExists)
+                {
+                    mls.LogDebug("LLL exists, grabbing it's weather info...");
+                    cWeather = typeof(TerminalManager).GetMethod("GetWeatherConditions", BindingFlags.Static | BindingFlags.NonPublic).Invoke
+                        (null, new object[1] { sl }).ToString().Replace("(", string.Empty).Replace(")", string.Empty);
+                }
+
+                if ((cWeather == "None" || cWeather == string.Empty) && ConfigManager.showClear)
+                {
+                    if (Chainloader.PluginInfos.ContainsKey("WeatherTweaks")) fullWeather[sl.levelID] = displayWeather[sl.levelID] = "None";
+                    else fullWeather[sl.levelID] = displayWeather[sl.levelID] = "Clear";
+                }
+                else if (cWeather == "None" || cWeather == string.Empty) fullWeather[sl.levelID] = displayWeather[sl.levelID] = string.Empty;
+                else if (cWeather.ToLower().Contains("unknown")) fullWeather[sl.levelID] = displayWeather[sl.levelID] = "[UNKNOWN]";
+                else if (cWeather.Length > 10 && !ConfigManager.longWeather) fullWeather[sl.levelID] = displayWeather[sl.levelID] = "Complex";
                 else if (cWeather.Length > 10 && cWeather.Contains("/") && cWeather.IndexOf('/') <= 10)
                 {
                     mls.LogDebug("splitting weather at slash");
-                    displayWeather[slUpdate.levelID] = cWeather.Substring(0, cWeather.IndexOf('/') + 1);
-                    halfWeather[slUpdate.levelID] = cWeather.Substring(cWeather.IndexOf("/") + 1);
+                    displayWeather[sl.levelID] = cWeather.Substring(0, cWeather.IndexOf('/') + 1);
+                    halfWeather[sl.levelID] = cWeather.Substring(cWeather.IndexOf("/") + 1);
+                    fullWeather[sl.levelID] = cWeather;
+                }
+                else if (cWeather.Length > 10 && cWeather.Contains(" ") && cWeather.IndexOf(' ') <= 10)
+                {
+                    mls.LogDebug("splitting weather at space");
+                    displayWeather[sl.levelID] = cWeather.Substring(0, cWeather.IndexOf(' ') + 1);
+                    halfWeather[sl.levelID] = cWeather.Substring(cWeather.IndexOf(' ') + 1);
+                    fullWeather[sl.levelID] = cWeather;
                 }
                 else if (cWeather.Length > 10)
                 {
-                    mls.LogMessage("splitting weather at length 10");
-                    displayWeather[slUpdate.levelID] = cWeather.Substring(0, 9) + "-";
-                    halfWeather[slUpdate.levelID] = cWeather.Substring(9);
+                    mls.LogDebug("splitting weather at length 10");
+                    displayWeather[sl.levelID] = cWeather.Substring(0, 9) + "-";
+                    halfWeather[sl.levelID] = cWeather.Substring(9);
+                    fullWeather[sl.levelID] = cWeather;
                 }
-                else displayWeather[slUpdate.levelID] = cWeather;
-                if (halfWeather[slUpdate.levelID].Length > 10) halfWeather[slUpdate.levelID] = halfWeather[slUpdate.levelID].Substring(0, 7) + "...";
+                else if (cWeather != null) fullWeather[sl.levelID] = displayWeather[sl.levelID] = cWeather;
+                else fullWeather[sl.levelID] = displayWeather[sl.levelID] = string.Empty;
+
+                if (halfWeather[sl.levelID].Length > 10) halfWeather[sl.levelID] = halfWeather[sl.levelID].Substring(0, 7) + "...";
             }
+
         }
+
 
     }
 }

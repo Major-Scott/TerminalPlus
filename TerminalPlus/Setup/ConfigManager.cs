@@ -170,14 +170,13 @@ namespace TerminalPlus
                         if (nounFinder.result.displayPlanetInfo == cuID)
                         {
                             nounFinder.noun.word = setCustomName.Value.ToLower();
-                            if (Nodes.moonPrefixes[cuID].Length > 0)
-                            {
-                                nounFinder.result.displayText = $"The cost to route to {Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
-                            }
-                            else nounFinder.result.displayText = $"The cost to route to {Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
+                            //if (Nodes.moonPrefixes[cuID].Length > 0)
+                            //{
+                            //    nounFinder.result.displayText = $"The cost to route to {Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
+                            //}
+                            //else nounFinder.result.displayText = $"The cost to route to {Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
                             nounFinder.result.itemCost = setCustomPrice.Value;
                         }
-
                     }
                     foreach (TerminalNode confirmNode in Nodes.confirmNodes)
                     {

@@ -32,7 +32,7 @@ namespace TerminalPlus
 
             if (StartOfRound.Instance.currentLevel.name == "CompanyBuildingLevel" || StartOfRound.Instance.inShipPhase)
             {
-                scrapList = Resources.FindObjectsOfTypeAll<GrabbableObject>().Where((GrabbableObject g) => g.itemProperties.isScrap && (g.isInShipRoom || g.isInElevator)).ToList();
+                scrapList = UnityEngine.Object.FindObjectsOfType<GrabbableObject>().Where((GrabbableObject g) => g.itemProperties.isScrap && (g.isInShipRoom || g.isInElevator)).ToList();
                 scanHeader = " Company-Ship™ Interior".PadRight(24);
             }
             else
@@ -85,7 +85,7 @@ namespace TerminalPlus
                 string simpleCount = $"There is currently {scrapList.Count} total scrap".PadRight(35);
                 int padLeft = (10 - totValue.ToString().Length)/2;
                 int padRight = 10 - totValue.ToString().Length - padLeft;
-                string simpleTotal = $"<size=120%>$</size><space=-3>{totValue}<space=-2>";
+                string simpleTotal = $"<size=120%>$</size><space=-3>{Mathf.RoundToInt(totValue/100)*100}<space=-2>";
                 pageChart.AppendLine($"  ║[  ]│ ----------------------------------- │[  ]║");
                 pageChart.AppendLine($"  ║[--]│ {simpleCount} │[--]║");
                 pageChart.AppendLine($"  ║[  ]│ with an approximate total value of: │[  ]║");

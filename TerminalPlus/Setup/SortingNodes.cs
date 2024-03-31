@@ -33,6 +33,20 @@ namespace TerminalPlus
         public static int valueMult = 0;
         public static int weatherMult = 0;
 
+        internal static Dictionary<string, int> weathersDic = new Dictionary<string, int>()
+        {
+            { string.Empty, 0 },
+            { "none", 0 },
+            { "dustclouds", 1 },
+            { "rainy", 2 },
+            { "stormy", 3 },
+            { "foggy", 4 },
+            { "flooded", 5 },
+            { "eclipsed", 6 },
+            { "[unknown]", 7 },
+            { "unknown", 7 }
+        };
+
         internal static TerminalNode CreateNode()
         {
             TerminalNode terminalNode = ScriptableObject.CreateInstance<TerminalNode>();
@@ -64,7 +78,7 @@ namespace TerminalPlus
         {
             mls.LogDebug("Start of CREATESORTNODES: " + nounTPList.Length);
             
-            nounTPList = new string[12]{ "default", "id", "name", "prefix", "grade", "price", "weather", "difficulty", "info", "help", "list", "current" };
+            nounTPList = new string[13]{ "default", "id", "name", "prefix", "grade", "price", "weather", "difficulty", "info", "help", "list", "current", "rev" };
             TerminalKeyword sortKeyword = CreateKeyword();
             TerminalKeyword reverseKeyword = CreateKeyword();
             mls.LogDebug("created sort and reverse");
@@ -93,9 +107,9 @@ namespace TerminalPlus
                 reverseKeyword.isVerb = true;
                 terminal.terminalNodes.allKeywords = terminal.terminalNodes.allKeywords.AddItem(reverseKeyword).ToArray();
             }
-            sortKeyword.compatibleNouns = new CompatibleNoun[12];
-            reverseKeyword.compatibleNouns = new CompatibleNoun[12];
-            mls.LogDebug("TOTAL NOUN COUNT (should be 12): " + nounTPList.Length);
+            sortKeyword.compatibleNouns = new CompatibleNoun[13];
+            reverseKeyword.compatibleNouns = new CompatibleNoun[13];
+            mls.LogDebug("TOTAL NOUN COUNT (should be 13): " + nounTPList.Length);
             for (int i = 0; i < nounTPList.Length; i++)
             {
                 TerminalKeyword nounKeyword = CreateKeyword();
@@ -116,19 +130,7 @@ namespace TerminalPlus
                 compatibleNoun.result = terminalNode;
                 sortKeyword.compatibleNouns[i] = compatibleNoun;
                 reverseKeyword.compatibleNouns[i] = compatibleNoun;
-                if (nounTPList[i] == "default")
-                {
-                    mls.LogWarning("in sort noun");
-                    
-                }
-                if (nounTPList[i] == "current")
-                {
-                    mls.LogWarning("in reverse noun");
-                    CompatibleNoun sortNoun = new CompatibleNoun { noun = sortKeyword, result = terminalNode };
-                    sortNoun.noun.specialKeywordResult = terminalNode;
-                    CompatibleNoun reverseNoun = new CompatibleNoun { noun = reverseKeyword, result = terminalNode };
-                    reverseNoun.noun.specialKeywordResult = terminalNode;
-                }
+                if (nounTPList[i] == "rev") reverseKeyword.specialKeywordResult = terminalNode;
             }
         }
 
@@ -216,8 +218,50 @@ namespace TerminalPlus
                     else return 0;
                 }
 
-                if (x.riskLevel.CompareTo(y.riskLevel) != 0) return x.riskLevel.CompareTo(y.riskLevel);
+                //if (x.riskLevel.CompareTo(y.riskLevel) != 0) return x.riskLevel.CompareTo(y.riskLevel);
+                else return x.riskLevel.CompareTo(y.riskLevel);
+            }
+        }
+
+        public static int SortByWeather(SelectableLevel x, SelectableLevel y)
+        {
+            if (x == null && y == null) return 0;
+            else if (x == null) return -1;
+            else if (y == null) return 1;
+            else
+            {
+                string xWeather = fullWeather[x.levelID].ToLower();
+                string yWeather = fullWeather[y.levelID].ToLower();
+
+                if (xWeather == yWeather) return 0;
+                else if ((xWeather == "None" || xWeather == string.Empty) && yWeather != "None" && yWeather != string.Empty) return 1;
+                else if ((yWeather == "None" || yWeather == string.Empty) && xWeather != "None" && xWeather != string.Empty) return -1;
+                else if (xWeather.Contains("?") && !yWeather.Contains("?")) return -1;
+                else if (yWeather.Contains("?") && !xWeather.Contains("?")) return 1;
+                else if (xWeather.Contains("/") && !yWeather.Contains("/")) return -1;
+                else if (yWeather.Contains("/") && !xWeather.Contains("/")) return 1;
+                else if (xWeather.Contains("/") && yWeather.Contains("/"))
+                {
+                    string x1 = xWeather.Substring(0, xWeather.IndexOf('/'));
+                    string x2 = xWeather.Substring(xWeather.IndexOf('/') + 1);
+                    string y1 = xWeather.Substring(0, yWeather.IndexOf('/'));
+                    string y2 = xWeather.Substring(yWeather.IndexOf('/') + 1);
+                    if (x1 == y1 && weathersDic.ContainsKey(x2) && weathersDic.ContainsKey(y2)) return weathersDic[x2].CompareTo(weathersDic[y2]);
+                    else if (weathersDic.ContainsKey(x1) && weathersDic.ContainsKey(x2) && weathersDic.ContainsKey(y1) && weathersDic.ContainsKey(y2))
+                    {
+                        return (weathersDic[x1] + weathersDic[x2]).CompareTo(weathersDic[y1] + weathersDic[y2]);
+                    }
+                    else return xWeather.CompareTo(yWeather);
+                }
+                else if (weathersDic.ContainsKey(xWeather.Replace("?", string.Empty)) && weathersDic.ContainsKey(yWeather.Replace("?", string.Empty)))
+                {
+                    return weathersDic[xWeather.Replace("?", string.Empty)].CompareTo(weathersDic[yWeather.Replace("?", string.Empty)]);
+                }
                 else return 0;
+                //int xNum, yNum;
+                //if (int.TryParse(xInput, out xNum) && int.TryParse(yInput, out yNum)) return xNum.CompareTo(yNum);
+                //else if (int.TryParse(xInput, out xNum)) return 1;
+                //else if (int.TryParse(yInput, out yNum)) return -1;
             }
         }
 

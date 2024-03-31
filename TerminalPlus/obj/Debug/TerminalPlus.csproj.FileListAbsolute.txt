@@ -109,5 +109,6 @@ C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\obj\Debug\Termin
 C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\obj\Debug\TerminalPlus.dll
 C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\obj\Debug\TerminalPlus.pdb
 C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\System.ValueTuple.dll
-C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\System.ValueTuple.xml
-C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\Mono.Cecil.dll
+C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\LethalLevelLoader.dll
+C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\LethalLib.dll
+C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\MMHOOK_Assembly-CSharp.dll

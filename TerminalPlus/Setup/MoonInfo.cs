@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using BepInEx.Logging;
 using HarmonyLib;
+using LethalLevelLoader;
 using UnityEngine;
 
 namespace TerminalPlus
@@ -18,9 +20,7 @@ namespace TerminalPlus
         private static string[] displayNames = new string[0];
         private static string[] displayPrefixes = new string[0];
         private static string[] displayGrades = new string[0];
-        private static string[] displayWeather = new string[0];
 
-        private static string[] halfWeather = new string[0];
         public static CompatibleNoun[] routeNouns = new CompatibleNoun[0];
         public static TerminalNode[] confirmNodes = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode k) => k.buyRerouteToMoon >= 0).ToArray();
         //public static TerminalKeyword[] moonKeywords = new TerminalKeyword[0];
@@ -118,18 +118,15 @@ namespace TerminalPlus
             displayNames = new string[moonsList.Count];
             displayPrefixes = new string[moonsList.Count];
             displayGrades = new string[moonsList.Count];
-            displayWeather = new string[moonsList.Count];
-            halfWeather = new string[moonsList.Count];
+            UpdateMoonWeather();
 
             foreach (SelectableLevel slSetup in moonsList)
             {
                 int cID = slSetup.levelID;
                 bool isLongPrefix = moonPrefixes.Any(p => p.Length == 4);
-                string cWeather = slSetup.currentWeather.ToString();
                 displayNames[cID] = moonNames[cID];
                 displayPrefixes[cID] = moonPrefixes[cID];
                 displayGrades[cID] = slSetup.riskLevel;
-                halfWeather[cID] = string.Empty;
 
                 displayNames[cID] = moonNames[cID].Length <= 15 ? moonNames[cID].PadRight(15) : moonNames[cID].Substring(0, 12) + "...";
 
@@ -138,23 +135,6 @@ namespace TerminalPlus
 
                 if (displayGrades[cID].ToLower() == "unknown") displayGrades[cID] = "??";
                 displayGrades[cID] = displayGrades[cID].Length <= 2 || displayGrades[cID] == "Safe" ? displayGrades[cID].PadRight(3).PadLeft(4) : displayGrades[cID].Substring(0, 2).PadRight(3).PadLeft(4);
-
-                if (slSetup.currentWeather == LevelWeatherType.None && ConfigManager.showClear) displayWeather[cID] = "Clear";
-                else if (slSetup.currentWeather == LevelWeatherType.None) displayWeather[cID] = string.Empty;
-                else if (cWeather.Length > 10 && !ConfigManager.longWeather) displayWeather[cID] = "Complex";
-                else if (cWeather.Length > 10 && cWeather.Contains("/") && cWeather.IndexOf('/') <= 10)
-                {
-                    displayWeather[cID] = cWeather.Substring(0, cWeather.IndexOf('/') + 1);
-                    halfWeather[cID] = cWeather.Substring(cWeather.IndexOf("/") + 1);
-                }
-                else if (cWeather.Length > 10)
-                {
-                    displayWeather[cID] = cWeather.Substring(0, 9) + "-";
-                    halfWeather[cID] = cWeather.Substring(9);
-                }
-                else displayWeather[cID] = cWeather;
-
-                if (halfWeather[cID].Length > 10) halfWeather[cID] = halfWeather[cID].Substring(0, 7) + "...";
             }
             
             switch (ConfigManager.defaultSort)
@@ -176,7 +156,8 @@ namespace TerminalPlus
                     catalogueSort = "     PRICE ⇩";
                     break;
                 case 5:
-                    moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
+                    if (PluginMain.LLLExists) moonsList.Sort(SortByWeather);
+                    else moonsList.Sort((x, y) => fullWeather[x.levelID].CompareTo(fullWeather[y.levelID]));
                     catalogueSort = "   WEATHER ⇩";
                     break;
                 case 6:
@@ -227,7 +208,6 @@ namespace TerminalPlus
 
 
             return;
-
         }
     }
 }

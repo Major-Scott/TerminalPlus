@@ -7,6 +7,7 @@ using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
+//using static TerminalPlus.Nodes;
 
 namespace TerminalPlus
 {  
@@ -69,7 +70,8 @@ namespace TerminalPlus
                         Nodes.catalogueSort = "     PRICE ⇩";
                         break;
                     case "weather":
-                        Nodes.moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
+                        if (PluginMain.LLLExists) Nodes.moonsList.Sort(Nodes.SortByWeather);
+                        else Nodes.moonsList.Sort((x, y) => Nodes.fullWeather[x.levelID].CompareTo(Nodes.fullWeather[y.levelID]));
                         Nodes.catalogueSort = "   WEATHER ⇩";
                         break;
                     case "difficulty":
@@ -80,16 +82,18 @@ namespace TerminalPlus
                         break;
                     case "current":
                         break;
+                    case "rev":
+                        break;
                     default:
                         break;
                 }
-                if (node.name.Contains("TPsort") && playerSubmit.Contains("rev"))
+                if (node.name.Contains("TPsort") && (playerSubmit.Contains("rev") || node.terminalEvent == "rev"))
                 {
                     Nodes.moonsList.Reverse();
                     if (Nodes.catalogueSort.Contains('⇧')) Nodes.catalogueSort = Nodes.catalogueSort.Substring(0, 11) + '⇩';
                     else Nodes.catalogueSort = Nodes.catalogueSort.Substring(0, 11) + '⇧';
                 }
-                else PluginMain.mls.LogInfo($"not reverse ):");
+                else PluginMain.mls.LogInfo($"not reverse :(");
 
                 newDisplayText = new Nodes().MoonsPage();
             }

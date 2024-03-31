@@ -15,6 +15,9 @@ namespace TerminalPlus
         {
             StringBuilder pageChart = new StringBuilder();
 
+
+
+
             if (ConfigManager.activeKilroy)
             {
                 pageChart.AppendLine("<line-height=100%>                                         _____     ");
@@ -42,9 +45,9 @@ namespace TerminalPlus
             {
                 if (ConfigManager.hiddenCompany && selectableLevel.name == "CompanyBuildingLevel") continue;
 
-                if (!ConfigManager.evenSort && catalogueSort == "     GRADE ⇩" && !firstNode && selectableLevel.riskLevel[0] != sortRef.riskLevel[0]) { }
-                else if (!ConfigManager.evenSort && catalogueSort == "     PRICE ⇩" && !firstNode && (Math.Abs(moonsPrice[selectableLevel.levelID] - moonsPrice[sortRef.levelID]) > 400)) { }
-                else if (!ConfigManager.evenSort && catalogueSort == "   WEATHER ⇩" && !firstNode && selectableLevel.currentWeather != sortRef.currentWeather) { }
+                if (!ConfigManager.evenSort && catalogueSort.Contains("GRADE") && !firstNode && selectableLevel.riskLevel[0] != sortRef.riskLevel[0]) { }
+                else if (!ConfigManager.evenSort && catalogueSort.Contains("PRICE") && !firstNode && (Math.Abs(moonsPrice[selectableLevel.levelID] - moonsPrice[sortRef.levelID]) > 400)) { }
+                else if (!ConfigManager.evenSort && catalogueSort.Contains("WEATHER") && !firstNode && displayWeather[selectableLevel.levelID] != displayWeather[sortRef.levelID]) { }
                 else if (counter >= 3) { }
                 else
                 {

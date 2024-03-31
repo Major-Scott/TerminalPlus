@@ -19,7 +19,7 @@ namespace TerminalPlus
             string routeName = moonPrefixes[routeID].Length > 0 ? $"{moonPrefixes[routeID]}-{moonNames[routeID]}" : moonNames[routeID];
 
             routeName = routeName.Length <= 26 ? routeName.ToUpper().PadRight(26) : routeName.Substring(0, 26).ToUpper();
-            string cWeather = currentMoon.currentWeather == LevelWeatherType.None  ? "Clear" : currentMoon.currentWeather.ToString();
+            //string cWeather = currentMoon.currentWeather == LevelWeatherType.None  ? "Clear" : currentMoon.currentWeather.ToString();
 
             pageChart.AppendLine("\n<line-height=100%>                                                    ");
             pageChart.AppendLine("<line-height=100%>  ╔═══════════════════╦═══════════─════─═══──═─-- -");
@@ -28,7 +28,7 @@ namespace TerminalPlus
             pageChart.AppendLine(@"  ║ ╩╚╚╝╩╚╚╝╚╝ ╩ ╚╝<voffset=3><space=2>□<space=-2></voffset>  ║             ");
             pageChart.AppendLine( "  ╚═══════════════════╝                            \n");
             pageChart.AppendLine($"  +-──-");
-            pageChart.AppendLine($"  │ Current  Weather:  {cWeather}");
+            pageChart.AppendLine($"  │ Current  Weather:  {fullWeather[routeID]}");
             pageChart.AppendLine($"  │ Hazard Lvl/Grade:  {currentMoon.riskLevel}");
             pageChart.AppendLine($"  +       ");
             pageChart.AppendLine($"  │ Rerouting to {moonNames[routeID]} costs ${moonsPrice[routeID]}.");
