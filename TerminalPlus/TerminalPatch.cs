@@ -106,7 +106,7 @@ namespace TerminalPlus
             {
                 __instance.screenText.caretBlinkRate = 2f;
                 __instance.screenText.textComponent.enableKerning = false;
-                //__instance.screenText.textComponent.enableWordWrapping = false;
+                __instance.screenText.textComponent.enableWordWrapping = false;
 
                 StringBuilder builder = new StringBuilder();
                 if ((bool)__instance.displayingPersistentImage) builder.Append("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -117,6 +117,7 @@ namespace TerminalPlus
                 __instance.currentText = builder.ToString();
                 __instance.textAdded = 0;
             }
+            else __instance.screenText.textComponent.enableWordWrapping = true;
         }
     }
 }
