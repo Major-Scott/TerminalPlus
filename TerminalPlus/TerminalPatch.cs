@@ -7,7 +7,7 @@ using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
-//using static TerminalPlus.Nodes;
+using static TerminalPlus.Nodes;
 
 namespace TerminalPlus
 {  
@@ -38,7 +38,7 @@ namespace TerminalPlus
             string newDisplayText = null;
             if (node == null) return;
 
-            if (node == Nodes.terminal.terminalNodes.specialNodes[13]) newDisplayText = new Nodes().MainHelpPage();
+            if (node == terminal.terminalNodes.specialNodes[13]) newDisplayText = new Nodes().MainHelpPage();
             else if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
 
             else if (node.name == "MoonsCatalogue" || node.name.Contains("TPsort"))
@@ -46,37 +46,36 @@ namespace TerminalPlus
                 switch (node.terminalEvent)
                 {
                     case "default":
-                        Nodes.moonsList.Sort(Nodes.SortByID);
-                        Nodes.catalogueSort = "   DEFAULT ⇩";
+                        masterList.Sort((x, y) => x.mID.CompareTo(y.mID));
+                        catalogueSort = "   DEFAULT ⇩";
                         break;
                     case "id":
-                        Nodes.moonsList.Sort(Nodes.SortByID);
-                        Nodes.catalogueSort = "   DEFAULT ⇩";
+                        masterList.Sort(SortByID);
+                        catalogueSort = "   DEFAULT ⇩";
                         break;
                     case "name":
-                        Nodes.moonsList.Sort((x, y) => Nodes.moonNames[x.levelID].CompareTo(Nodes.moonNames[y.levelID]));
-                        Nodes.catalogueSort = "      NAME ⇩";
+                        masterList.Sort((x, y) => x.mName.CompareTo(y.mName));
+                        catalogueSort = "      NAME ⇩";
                         break;
                     case "prefix":
-                        Nodes.moonsList.Sort(Nodes.SortByPrefix);
-                        Nodes.catalogueSort = "    PREFIX ⇩";
+                        masterList.Sort(SortByPrefix);
+                        catalogueSort = "    PREFIX ⇩";
                         break;
                     case "grade":
-                        Nodes.moonsList.Sort(Nodes.SortByGrade);
-                        Nodes.catalogueSort = "     GRADE ⇩";
+                        masterList.Sort(SortByGrade);
+                        catalogueSort = "     GRADE ⇩";
                         break;
                     case "price":
-                        Nodes.moonsList.Sort((x, y) => Nodes.moonsPrice[x.levelID].CompareTo(Nodes.moonsPrice[y.levelID]));
-                        Nodes.catalogueSort = "     PRICE ⇩";
+                        masterList.Sort((x, y) => x.mPrice.CompareTo(y.mPrice));
+                        catalogueSort = "     PRICE ⇩";
                         break;
                     case "weather":
-                        if (PluginMain.LLLExists) Nodes.moonsList.Sort(Nodes.SortByWeather);
-                        else Nodes.moonsList.Sort((x, y) => Nodes.fullWeather[x.levelID].CompareTo(Nodes.fullWeather[y.levelID]));
-                        Nodes.catalogueSort = "   WEATHER ⇩";
+                        masterList.Sort(SortByWeather);
+                        catalogueSort = "   WEATHER ⇩";
                         break;
                     case "difficulty":
-                        Nodes.moonsList.Sort(Nodes.SortByDifficulty);
-                        Nodes.catalogueSort = "DIFFICULTY ⇩";
+                        masterList.Sort(SortByDifficulty);
+                        catalogueSort = "DIFFICULTY ⇩";
                         break;
                     case "list":
                         break;
@@ -89,9 +88,9 @@ namespace TerminalPlus
                 }
                 if (node.name.Contains("TPsort") && (playerSubmit.Contains("rev") || node.terminalEvent == "rev"))
                 {
-                    Nodes.moonsList.Reverse();
-                    if (Nodes.catalogueSort.Contains('⇧')) Nodes.catalogueSort = Nodes.catalogueSort.Substring(0, 11) + '⇩';
-                    else Nodes.catalogueSort = Nodes.catalogueSort.Substring(0, 11) + '⇧';
+                    masterList.Reverse();
+                    if (catalogueSort.Contains('⇧')) catalogueSort = catalogueSort.Substring(0, 11) + '⇩';
+                    else catalogueSort = catalogueSort.Substring(0, 11) + '⇧';
                 }
                 else PluginMain.mls.LogInfo($"not reverse :(");
 
@@ -107,7 +106,7 @@ namespace TerminalPlus
             {
                 __instance.screenText.caretBlinkRate = 2f;
                 __instance.screenText.textComponent.enableKerning = false;
-                __instance.screenText.textComponent.enableWordWrapping = false;
+                //__instance.screenText.textComponent.enableWordWrapping = false;
 
                 StringBuilder builder = new StringBuilder();
                 if ((bool)__instance.displayingPersistentImage) builder.Append("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");

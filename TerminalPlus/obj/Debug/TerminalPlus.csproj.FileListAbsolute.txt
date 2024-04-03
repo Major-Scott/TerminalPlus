@@ -112,3 +112,4 @@ C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\System
 C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\LethalLevelLoader.dll
 C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\LethalLib.dll
 C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\MMHOOK_Assembly-CSharp.dll
+C:\Users\Beige Man\Desktop\LC Testing\TerminalPlus\TerminalPlus\bin\Debug\MoreShipUpgrades.dll

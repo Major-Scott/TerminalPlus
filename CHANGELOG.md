@@ -1,3 +1,9 @@
+## v1.0.1
+- Much better compatibility with WeatherTweaks, LethalLevelLoader, and LateGameUpgrades
+- LateGameUpgrades upgrades now also appear on the main store page (though they're still missing the confirm page)
+- Updated the "scan info" page to reflect the v1.0.0 sorting changes
+- Rebuilt a good half of it which should hopefully make updates and patches quicker and easier (key word being "hopefully")
+- *Kilroy is here.*
 
 ## v1.0.0
 - **Official Release!!!**
@@ -25,7 +31,7 @@
 - Added a price override option for compatibility with other price-changing mods. Enter "-1" as the price in the config to bypass it and use the non-TerminalPlus value.
 - Remade the logo a lot cleaner (it was bugging me)
 - Probably some other small changes/additions (I did so much I've honestly forgotten)
-- Kilroy is here.
+- Kilroy was here.
 
 ## v0.2.2
 - Fixed small problem with the difficulty algorhythm

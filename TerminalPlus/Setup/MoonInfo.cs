@@ -4,45 +4,72 @@ using System.Linq;
 using System.Reflection;
 using BepInEx.Logging;
 using HarmonyLib;
-using LethalLevelLoader;
 using UnityEngine;
 
 namespace TerminalPlus
 {
+    public class MoonMaster
+    {
+        public readonly SelectableLevel mLevel;
+        public readonly string mLevelName;
+        public bool mPriceOR;
+
+        public readonly string origName;
+        public string mName = string.Empty;    
+        public string mPrefix = string.Empty;
+        public int mID;
+        public string mGrade;
+        public bool mVis = true;
+        public string mWeather;
+        public int mPrice = -1;
+        public string mDesc;
+
+        public string dispName = string.Empty;
+        public string dispPrefix = string.Empty;
+        public string dispGrade;
+        public string dispWeather;
+        public string halfWeather = string.Empty;
+
+        public MoonMaster(SelectableLevel moon)
+        {
+            mLevel = moon;
+            mLevelName = moon.name;
+            origName = moon.PlanetName;
+            mID = moon.levelID;
+            mWeather = dispWeather = moon.currentWeather.ToString();
+            mGrade = dispGrade = moon.riskLevel;
+            mDesc = moon.LevelDescription;
+        }
+    }
+
     public partial class Nodes
     {
         public static List<SelectableLevel> moonsList = new List<SelectableLevel>();
-
-        public static int[] moonsPrice;
-        public static List<string> moonNames = new List<string>();
-        public static List<string> moonPrefixes = new List<string>();
-
-        private static string[] displayNames = new string[0];
-        private static string[] displayPrefixes = new string[0];
-        private static string[] displayGrades = new string[0];
+        public static Dictionary<int, MoonMaster> moonMasters = new Dictionary<int, MoonMaster>();
+        public static List<MoonMaster> masterList = new List<MoonMaster>();
 
         public static CompatibleNoun[] routeNouns = new CompatibleNoun[0];
         public static TerminalNode[] confirmNodes = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode k) => k.buyRerouteToMoon >= 0).ToArray();
-        //public static TerminalKeyword[] moonKeywords = new TerminalKeyword[0];
 
         public static string catalogueSort = "   DEFAULT ⇩";
+        
 
         public static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource("TerminalPlus");
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(100)]
+        [HarmonyPriority(3)]
         private static void PatchMoonInfo()
         {
             List<int> IDChecker = new List<int>();
             List<SelectableLevel> errorArray = new List<SelectableLevel>();
             routeNouns = terminal.terminalNodes.allKeywords[26].compatibleNouns;
-            moonsList.Clear();
+            //moonsList.Clear();
+            moonMasters.Clear();
             moonsList = Resources.FindObjectsOfTypeAll<SelectableLevel>().ToList();
 
             foreach (SelectableLevel selectableLevel in moonsList)
             {
-                mls.LogInfo($"Checking level {selectableLevel.PlanetName}'s ID: {selectableLevel.levelID}");
                 if (selectableLevel.levelID < 0)//-----------------------------------------------------confirms IDs
                 {
                     mls.LogInfo($"Entry \"{selectableLevel.PlanetName}\" has an ID below zero. Removing...");
@@ -56,30 +83,31 @@ namespace TerminalPlus
                     continue;
                 }
                 IDChecker.Add(selectableLevel.levelID);
+                moonMasters.Add(selectableLevel.levelID, new MoonMaster(selectableLevel));
             }
 
-            foreach (SelectableLevel item in errorArray) moonsList.Remove(item);//-----------------fixes arrays
+            //foreach (SelectableLevel item in errorArray) moonsList.Remove(item);//-----------------fixes arrays
 
             for(int i = errorArray.Count - 1; i >= 0; i--)
             {
+                mls.LogWarning("destroying dupe: " + errorArray[i].name);
                 moonsList.Remove(errorArray[i]);
                 UnityEngine.Object.Destroy(errorArray[i]);
             }
-
-            Array.Resize(ref moonsPrice, moonsList.Count);
-            moonsList.Sort(SortByID);
+            mls.LogWarning("  moonlist length: " + moonsList.Count);
+            mls.LogWarning("masterlist length: " + moonMasters.Count);
+            //Array.Resize(ref moonsPrice, moonMasters.Count);
             IDChecker.Clear();
 
-            foreach (SelectableLevel slMatcher in moonsList)
+            foreach (MoonMaster moonFP in moonMasters.Values)
             {
                 foreach (CompatibleNoun compatibleNoun in routeNouns)
                 {
-                    if (compatibleNoun.result.displayPlanetInfo == slMatcher.levelID)
+                    if (compatibleNoun.result.displayPlanetInfo == moonFP.mID)
                     {
-                        moonsPrice[slMatcher.levelID] = compatibleNoun.result.itemCost;
-                        mls.LogInfo($"Found price of {slMatcher.PlanetName}: ${moonsPrice[slMatcher.levelID]}");
+                        moonFP.mPrice = compatibleNoun.result.itemCost;
+                        mls.LogInfo($"Found price of {moonFP.mLevelName}: ${moonFP.mPrice}");
                     }
-                    
                 }
             }
         }
@@ -87,125 +115,116 @@ namespace TerminalPlus
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(100)]
+        [HarmonyPriority(3)]
         public static void NameSeparator()
         {
-            moonNames.Clear();
-            moonPrefixes.Clear();
+            //moonNames.Clear();
+            //moonPrefixes.Clear();
             
-            foreach (SelectableLevel selectableLevel in moonsList)
+            foreach (MoonMaster moonNS in moonMasters.Values)
             {
-                string namePrefix = string.Empty;
-                string nameTrimmed;
-                if (!char.IsDigit(selectableLevel.PlanetName.First())) nameTrimmed = selectableLevel.PlanetName;
+                if (!char.IsDigit(moonNS.origName.First())) moonNS.mName = moonNS.origName;
                 else
                 {
-                    namePrefix = selectableLevel.PlanetName.Substring(0, selectableLevel.PlanetName.IndexOf(' '));
-                    nameTrimmed = selectableLevel.PlanetName.Substring(selectableLevel.PlanetName.IndexOf(' ') + 1);
+                    moonNS.mPrefix = moonNS.origName.Substring(0, moonNS.origName.IndexOf(' '));
+                    moonNS.mName = moonNS.origName.Substring(moonNS.origName.IndexOf(' ') + 1);
                 }
-                moonNames.Insert(selectableLevel.levelID, nameTrimmed);
-                moonPrefixes.Insert(selectableLevel.levelID, namePrefix);
             }
         }
 
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(98)]
+        [HarmonyPriority(1)]
         public static void MoonCatalogueSetup()
         {
             mls.LogDebug("SETUP START");
-            displayNames = new string[moonsList.Count];
-            displayPrefixes = new string[moonsList.Count];
-            displayGrades = new string[moonsList.Count];
             UpdateMoonWeather();
 
-            foreach (SelectableLevel slSetup in moonsList)
+            foreach (MoonMaster moonMCS in moonMasters.Values)
             {
-                int cID = slSetup.levelID;
-                bool isLongPrefix = moonPrefixes.Any(p => p.Length == 4);
-                displayNames[cID] = moonNames[cID];
-                displayPrefixes[cID] = moonPrefixes[cID];
-                displayGrades[cID] = slSetup.riskLevel;
+                int cID = moonMCS.mID;
+                bool isLongPrefix = moonMasters.Values.Any(p => p.mPrefix.Length == 4);
 
-                displayNames[cID] = moonNames[cID].Length <= 15 ? moonNames[cID].PadRight(15) : moonNames[cID].Substring(0, 12) + "...";
+                moonMCS.dispName = moonMCS.mName.Length <= 15 ? moonMCS.mName.PadRight(15) : moonMCS.mName.Substring(0, 12) + "...";
 
-                if (isLongPrefix) { displayPrefixes[cID] = moonPrefixes[cID].Length <= 4 ? moonPrefixes[cID].PadLeft(4, ConfigManager.padChar) : moonPrefixes[cID].Substring(0, 4); }
-                else { displayPrefixes[cID] = displayPrefixes[cID].Length <= 3 ? moonPrefixes[cID].PadLeft(3, ConfigManager.padChar) : moonPrefixes[cID].Substring(0, 3); }
+                if (isLongPrefix) { moonMCS.dispPrefix = moonMCS.mPrefix.Length <= 4 ? moonMCS.mPrefix.PadLeft(4, ConfigManager.padChar) : moonMCS.mPrefix.Substring(0, 4); }
+                else { moonMCS.dispPrefix = moonMCS.mPrefix.Length <= 3 ? moonMCS.mPrefix.PadLeft(3, ConfigManager.padChar) : moonMCS.mPrefix.Substring(0, 3); }
 
-                if (displayGrades[cID].ToLower() == "unknown") displayGrades[cID] = "??";
-                displayGrades[cID] = displayGrades[cID].Length <= 2 || displayGrades[cID] == "Safe" ? displayGrades[cID].PadRight(3).PadLeft(4) : displayGrades[cID].Substring(0, 2).PadRight(3).PadLeft(4);
+                if (moonMCS.dispGrade.ToLower() == "unknown") moonMCS.dispGrade = "??";
+                moonMCS.dispGrade = moonMCS.dispGrade.Length <= 2 || moonMCS.dispGrade == "Safe" ? moonMCS.dispGrade.PadRight(3).PadLeft(4) : moonMCS.dispGrade.Substring(0, 2).PadRight(3).PadLeft(4);
+
+                if (moonMCS.mLevelName == "CompanyBuildingLevel" && moonMCS.mName == "Company Building") moonMCS.dispName = "Company<space=0.5en>Building<space=-0.5en>";
             }
-            
+            masterList = moonMasters.Values.ToList();
+
             switch (ConfigManager.defaultSort)
             {
                 case 1:
-                    moonsList.Sort((x, y) => moonNames[x.levelID].CompareTo(moonNames[y.levelID]));
+                    masterList.Sort((x, y) => x.mName.CompareTo(y.mName));
                     catalogueSort = "      NAME ⇩";
                     break;
                 case 2:
-                    moonsList.Sort(SortByPrefix);
+                    masterList.Sort(SortByPrefix);
                     catalogueSort = "    PREFIX ⇩";   //⇧⇩
                     break;
                 case 3:
-                    moonsList.Sort(SortByGrade);
+                    masterList.Sort(SortByGrade);
                     catalogueSort = "     GRADE ⇩";
                     break;
                 case 4:
-                    moonsList.Sort((x, y) => moonsPrice[x.levelID].CompareTo(moonsPrice[y.levelID]));
+                    masterList.Sort((x, y) => x.mPrice.CompareTo(y.mPrice));
                     catalogueSort = "     PRICE ⇩";
                     break;
                 case 5:
-                    if (PluginMain.LLLExists) moonsList.Sort(SortByWeather);
-                    else moonsList.Sort((x, y) => fullWeather[x.levelID].CompareTo(fullWeather[y.levelID]));
+                    masterList.Sort(SortByWeather);
                     catalogueSort = "   WEATHER ⇩";
                     break;
                 case 6:
-                    moonsList.Sort(SortByDifficulty);
+                    masterList.Sort(SortByDifficulty);
                     catalogueSort = "DIFFICULTY ⇩";
                     break;
                 case 7:
-                    moonsList.Sort(SortByID);
-                    moonsList.Reverse();
+                    masterList.Sort((x,y) => x.mID.CompareTo(y.mID));
+                    masterList.Reverse();
                     catalogueSort = "   DEFAULT ⇧";
                     break;
                 case 8:
-                    moonsList.Sort((x, y) => moonNames[x.levelID].CompareTo(moonNames[y.levelID]));
-                    moonsList.Reverse();
+                    masterList.Sort((x, y) => x.mName.CompareTo(y.mName));
+                    masterList.Reverse();
                     catalogueSort = "      NAME ⇧";
                     break;
                 case 9:
-                    moonsList.Sort(SortByPrefix);
-                    moonsList.Reverse();
+                    masterList.Sort(SortByPrefix);
+                    masterList.Reverse();
                     catalogueSort = "    PREFIX ⇧";
                     break;
                 case 10:
-                    moonsList.Sort(SortByGrade);
-                    moonsList.Reverse();
+                    masterList.Sort(SortByGrade);
+                    masterList.Reverse();
                     catalogueSort = "     GRADE ⇧";
                     break;
                 case 11:
-                    moonsList.Sort((x, y) => moonsPrice[x.levelID].CompareTo(moonsPrice[y.levelID]));
-                    moonsList.Reverse();
+                    masterList.Sort((x, y) => x.mPrice.CompareTo(y.mPrice));
+                    masterList.Reverse();
                     catalogueSort = "     PRICE ⇧";
                     break;
                 case 12:
-                    moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
-                    moonsList.Reverse();
+                    masterList.Sort(SortByWeather);
+                    masterList.Reverse();
                     catalogueSort = "   WEATHER ⇧";
                     break;
                 case 13:
-                    moonsList.Sort(SortByDifficulty);
-                    moonsList.Reverse();
+                    masterList.Sort(SortByDifficulty);
+                    masterList.Reverse();
                     catalogueSort = "DIFFICULTY ⇧";
                     break;
                 default:
-                    moonsList.Sort(SortByID);
+                    masterList.Sort((x, y) => x.mID.CompareTo(y.mID));
                     catalogueSort = "   DEFAULT ⇩";
                     break;
             }
             mls.LogDebug("SETUP END");
-
 
             return;
         }

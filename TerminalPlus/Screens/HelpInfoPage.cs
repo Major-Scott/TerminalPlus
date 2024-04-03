@@ -28,7 +28,7 @@ namespace TerminalPlus
 
             pageChart2.AppendLine("\n\n         <size=120%><color=yellow>\"SORT\"</color> and <color=red>\"REVERSE\"</color> Settings</size>          ");
             pageChart2.AppendLine("<line-height=70%>        <size=120%>‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾          ");
-            pageChart2.AppendLine("</line-height></size>>\"ID\" <size=90%><color=yellow>(LOWEST first)  <color=red>(HIGHEST first)</color></color></size>");
+            pageChart2.AppendLine("</line-height></size>>\"DEFAULT\" or \"ID\" <size=90%><color=yellow>(LOWEST first)  <color=red>(HIGHEST first)</color></color></size>");
             pageChart2.AppendLine("Sorts moons by internal ID; the default setting.<line-height=50%>\n</line-height>");
             pageChart2.AppendLine(">\"NAME\" <size=90%><color=yellow>('A' first)  <color=red>('Z' first)</color></color></size>");
             pageChart2.AppendLine("Sorts moons alphabetically by name.<line-height=50%>\n</line-height>");
@@ -42,7 +42,7 @@ namespace TerminalPlus
             pageChart2.AppendLine("Sorts moons by current weather conditions.<line-height=50%>\n</line-height>");
             pageChart2.AppendLine(">\"DIFFICULTY\" <size=90%><color=yellow>(EASIEST first)  <color=red>(HARDEST first)</color></color></size>");
             pageChart2.AppendLine("Sorts moons by calculated difficulty.<line-height=50%>\n</line-height>");
-            pageChart2.AppendLine(">\"CURRENT\" or \"LIST\" <size=90%><color=yellow>(N/A)  <color=red>(Reverse current)</color></color></size>");
+            pageChart2.AppendLine(">\"CURRENT\", \"LIST\", or NONE <size=90%><color=yellow>(N/A)  <color=red>(Reverse current)</color></color></size>");
             pageChart2.AppendLine("Reverse the current page.");
 
             return pageChart2.ToString();

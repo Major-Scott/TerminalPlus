@@ -5,19 +5,24 @@ using System.Text;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
+using TerminalPlus.Mods;
 
 namespace TerminalPlus
 {
     partial class Nodes
     {
+        public static List<Item> storeItems = new List<Item>();
+        public static List<TerminalNode> storeDecorations = new List<TerminalNode>();
+        public static List<UnlockableItem> storeShipUpgrades = new List<UnlockableItem>();
+
         public string StorePage(Terminal terminal)
         {
             var instanceOnShip = GameObject.Find("/Environment/HangarShip").GetComponentsInChildren<GrabbableObject>().ToList();
 
-            List<Item> storeItems = terminal.buyableItemsList.ToList();
-            List<TerminalNode> storeDecorations = terminal.ShipDecorSelection.OrderBy(x => x.creatureName).ToList();
-            List<UnlockableItem> storeShipUpgrades = StartOfRound.Instance.unlockablesList.unlockables.Where(x => x.unlockableType == 1 && x.alwaysInStock == true).ToList();
-            storeItems.OrderBy(x => x.itemName);
+            storeItems = terminal.buyableItemsList.OrderBy(x => x.itemName).ToList();
+            if (PluginMain.LethalLibExists) LethalLibCompatibility.RemoveHiddenStoreItems(terminal);
+            storeDecorations = terminal.ShipDecorSelection.OrderBy(x => x.creatureName).ToList();
+            storeShipUpgrades = StartOfRound.Instance.unlockablesList.unlockables.Where(x => x.unlockableType == 1 && x.alwaysInStock == true).ToList();
             StringBuilder pageChart = new StringBuilder();
 
             pageChart.AppendLine("\n\n  ╔═══════════════════════════════════════════════╗");
@@ -54,10 +59,10 @@ namespace TerminalPlus
             storeShipUpgrades.OrderBy(x => x.unlockableName).ToList();
             Dictionary<string, string> defaultUpgrades = new Dictionary<string, string>()
             {
-                { "Teleporter", "375 " },
-                { "Signal translator", "255 " },
-                { "Loud horn", "100 " },
-                { "Inverse Teleporter", "425 " }
+                { "teleporter", "375 " },
+                { "signal translator", "255 " },
+                { "loud horn", "100 " },
+                { "inverse teleporter", "425 " }
             };
 
             foreach (UnlockableItem upgrade in storeShipUpgrades)
@@ -66,13 +71,14 @@ namespace TerminalPlus
                 string upgradePrice = string.Empty;
                 string upgradeName = upgrade.unlockableName;
 
-                if (defaultUpgrades.ContainsKey(upgrade.unlockableName)) upgradePrice = defaultUpgrades[upgrade.unlockableName];
+                if (defaultUpgrades.ContainsKey(upgrade.unlockableName.ToLower())) upgradePrice = defaultUpgrades[upgrade.unlockableName.ToLower()];
                 else if (upgradeNode != null) upgradePrice = upgradeNode.itemCost.ToString().PadRight(4);
                 else
                 {
                     upgradeNode = UnityEngine.Object.FindObjectsOfType<TerminalNode>().ToList().Find(x => x.shipUnlockableID ==
                     StartOfRound.Instance.unlockablesList.unlockables.ToList().IndexOf(upgrade));
-                    if (upgradeNode == null) upgradePrice = "??? ";
+                    if (upgradeNode != null) upgradePrice = upgradeNode.itemCost.ToString().PadRight(4);
+                    else upgradePrice = "??? ";
                 }
                 upgradeName = upgradeName.Length > 20 ? upgradeName.Substring(0, 17) + "..." : upgradeName.PadRight(20);
 
@@ -85,6 +91,8 @@ namespace TerminalPlus
                     pageChart.AppendLine($"  ║ {upgradeName} |<cspace=-2> $</cspace>{upgradePrice}<cspace=-0.6> |</cspace>     |          ║");
                 }
             }
+            if (PluginMain.LGUExists) pageChart.Append(LGU.LGUCompatibility.LGUString());
+
             pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣");
 
             foreach (TerminalNode decoration in storeDecorations)

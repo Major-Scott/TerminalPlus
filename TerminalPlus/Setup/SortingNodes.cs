@@ -136,7 +136,7 @@ namespace TerminalPlus
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(10)]
+        [HarmonyPriority(0)]
         public static void CreateNodes()
         {
             TerminalKeyword shipKeyword = CreateKeyword();
@@ -159,38 +159,34 @@ namespace TerminalPlus
 
 //============================================================================================
 
-        public static int SortByID(SelectableLevel x, SelectableLevel y)
+        public static int SortByID(MoonMaster x, MoonMaster y)
         {
             if (x == null && y == null) return 0;
             else if (x == null) return -1;
             else if (y == null) return 1;
             else
             {
-                int retval = x.levelID.CompareTo(y.levelID);
+                int retval = x.mID.CompareTo(y.mID);
                 if (retval != 0) return retval;
                 else return 0;
             }
         }
 
-        public static int SortByPrefix(SelectableLevel x, SelectableLevel y)
+        public static int SortByPrefix(MoonMaster x, MoonMaster y)
         {
             if (x == null && y == null) return 0;
             else if (x == null) return -1;
             else if (y == null) return 1;
             else
             {
-                string xInput = moonPrefixes[x.levelID];
-                string yInput = moonPrefixes[y.levelID];
-
-                int xNum, yNum;
-                if (int.TryParse(xInput, out xNum) && int.TryParse(yInput, out yNum)) return xNum.CompareTo(yNum);
-                else if (int.TryParse(xInput, out xNum)) return 1;
-                else if (int.TryParse(yInput, out yNum)) return -1;
+                if (int.TryParse(x.mPrefix, out int xNum) && int.TryParse(y.mPrefix, out int yNum)) return xNum.CompareTo(yNum);
+                else if (int.TryParse(x.mPrefix, out xNum)) return 1;
+                else if (int.TryParse(y.mPrefix, out yNum)) return -1;
                 else return 0;
             }
         }
 
-        public static int SortByGrade(SelectableLevel y, SelectableLevel x)
+        public static int SortByGrade(MoonMaster y, MoonMaster x)
         {
             
             if (x == null && y == null) return 0;
@@ -198,44 +194,48 @@ namespace TerminalPlus
             else if (y == null) return 1;
             else
             {
+                string xGrade = x.mGrade;
+                string yGrade = y.mGrade;
 
-                if (x.riskLevel == "Safe" && y.riskLevel != "Safe") return 1;
-                else if (x.riskLevel != "Safe" && y.riskLevel == "Safe") return -1;
-                else if (x.riskLevel == "Safe" && y.riskLevel == "Safe") return 0;
+                if (xGrade == yGrade) return 0;
+                else if (xGrade == "Safe" && yGrade != "Safe") return 1;
+                else if (xGrade != "Safe" && yGrade == "Safe") return -1;
+                else if (xGrade == "??" && yGrade != "??") return -1;
+                else if (xGrade != "??" && yGrade == "??") return 1;
 
-                if (x.riskLevel[0] == 'S' && y.riskLevel[0] != 'S') return -1;
-                else if (x.riskLevel[0] != 'S' && y.riskLevel[0] == 'S') return 1;
-                else if (x.riskLevel.Contains("SS") && !y.riskLevel.Contains("SS")) return -1;
-                else if (!x.riskLevel.Contains("SS") && y.riskLevel.Contains("SS")) return 1;
+                if (xGrade[0] == 'S' && yGrade[0] != 'S') return -1;
+                else if (xGrade[0] != 'S' && yGrade[0] == 'S') return 1;
+                else if (xGrade.Contains("SS") && !yGrade.Contains("SS")) return -1;
+                else if (!xGrade.Contains("SS") && yGrade.Contains("SS")) return 1;
 
-                if (x.riskLevel[0] == y.riskLevel[0])
+                if (xGrade[0] == yGrade[0])
                 {
 
-                    if (x.riskLevel.Contains('+') && !y.riskLevel.Contains("+")) return -1;
-                    else if (!x.riskLevel.Contains('+') && y.riskLevel.Contains("+")) return 1;
-                    else if (!x.riskLevel.Contains('-') && y.riskLevel.Contains("-")) return -1;
-                    else if (x.riskLevel.Contains('-') && !y.riskLevel.Contains("-")) return 1;
+                    if (xGrade.Contains('+') && !yGrade.Contains("+")) return -1;
+                    else if (!xGrade.Contains('+') && yGrade.Contains("+")) return 1;
+                    else if (!xGrade.Contains('-') && yGrade.Contains("-")) return -1;
+                    else if (xGrade.Contains('-') && !yGrade.Contains("-")) return 1;
                     else return 0;
                 }
 
                 //if (x.riskLevel.CompareTo(y.riskLevel) != 0) return x.riskLevel.CompareTo(y.riskLevel);
-                else return x.riskLevel.CompareTo(y.riskLevel);
+                else return xGrade.CompareTo(y.mGrade);
             }
         }
 
-        public static int SortByWeather(SelectableLevel x, SelectableLevel y)
+        public static int SortByWeather(MoonMaster x, MoonMaster y)
         {
             if (x == null && y == null) return 0;
             else if (x == null) return -1;
             else if (y == null) return 1;
             else
             {
-                string xWeather = fullWeather[x.levelID].ToLower();
-                string yWeather = fullWeather[y.levelID].ToLower();
+                string xWeather = x.mWeather.ToLower();
+                string yWeather = y.mWeather.ToLower();
 
                 if (xWeather == yWeather) return 0;
-                else if ((xWeather == "None" || xWeather == string.Empty) && yWeather != "None" && yWeather != string.Empty) return 1;
-                else if ((yWeather == "None" || yWeather == string.Empty) && xWeather != "None" && xWeather != string.Empty) return -1;
+                else if ((xWeather == "none" || xWeather == string.Empty) && yWeather != "none" && yWeather != string.Empty) return 1;
+                else if ((yWeather == "none" || yWeather == string.Empty) && xWeather != "none" && xWeather != string.Empty) return -1;
                 else if (xWeather.Contains("?") && !yWeather.Contains("?")) return -1;
                 else if (yWeather.Contains("?") && !xWeather.Contains("?")) return 1;
                 else if (xWeather.Contains("/") && !yWeather.Contains("/")) return -1;
@@ -265,23 +265,55 @@ namespace TerminalPlus
             }
         }
 
-        public static int SortByDifficulty(SelectableLevel y, SelectableLevel x)
+        public static int SortByDifficulty(MoonMaster y, MoonMaster x)
         {
             if (x == null && y == null) return 0;
             else if (x == null) return -1;
             else if (y == null) return 1;
             else
             {
-                if (x.riskLevel == "Safe" && y.riskLevel != "Safe") return 1;
-                else if (x.riskLevel != "Safe" && y.riskLevel == "Safe") return -1;
+                int xDayEPC = x.mLevel.maxDaytimeEnemyPowerCount;
+                int xDayEnemies = x.mLevel.DaytimeEnemies.Count;
+                int xOutEPC = x.mLevel.maxOutsideEnemyPowerCount;
+                int xOutEnemies = x.mLevel.OutsideEnemies.Count;
+                int xInEPC = x.mLevel.maxEnemyPowerCount;
+                int xInEnemies = x.mLevel.Enemies.Count;
+                float xFactSize = x.mLevel.factorySizeMultiplier;
+                int xMinScrap = x.mLevel.minTotalScrapValue;
+                int xMaxScrap = x.mLevel.maxTotalScrapValue;
+                int xWeather = weathersDic.ContainsKey(x.mWeather.Replace("?", string.Empty)) ? weathersDic[x.mWeather.Replace("?", string.Empty)] : 0;
+                if (x.mWeather.ToLower().Contains("/"))
+                {
+                    string xHalf = x.mWeather.Substring(0, x.mWeather.IndexOf('/'));
+                    xWeather = weathersDic.ContainsKey(xHalf) ? weathersDic[xHalf] : 0;
+                }
 
-                float xDiff = x.maxDaytimeEnemyPowerCount*dayPowerMult + x.maxOutsideEnemyPowerCount*nightPowerMult + x.maxEnemyPowerCount*insidePowerMult + 
-                    x.DaytimeEnemies.Count*dayCountMult + x.OutsideEnemies.Count*nightCountMult + x.Enemies.Count*insideCountMult +
-                    x.factorySizeMultiplier*sizeMult + ((int)x.currentWeather + 1)*weatherMult + ((x.minTotalScrapValue + x.maxTotalScrapValue)/2)*valueMult;
+                int yDayEPC = y.mLevel.maxDaytimeEnemyPowerCount;
+                int yDayEnemies = y.mLevel.DaytimeEnemies.Count;
+                int yOutEPC = y.mLevel.maxOutsideEnemyPowerCount;
+                int yOutEnemies = y.mLevel.OutsideEnemies.Count;
+                int yInEPC = y.mLevel.maxEnemyPowerCount;
+                int yInEnemies = y.mLevel.Enemies.Count;
+                float yFactSize = y.mLevel.factorySizeMultiplier;
+                int yMinScrap = y.mLevel.minTotalScrapValue;
+                int yMaxScrap = y.mLevel.maxTotalScrapValue;
+                int yWeather = weathersDic.ContainsKey(y.mWeather.Replace("?", string.Empty)) ? weathersDic[y.mWeather.Replace("?", string.Empty)] : 0;
+                if (y.mWeather.ToLower().Contains("/"))
+                {
+                    string yHalf = y.mWeather.Substring(0, y.mWeather.IndexOf('/'));
+                    yWeather = weathersDic.ContainsKey(yHalf) ? weathersDic[yHalf] : 0;
+                }
 
-                float yDiff = y.maxDaytimeEnemyPowerCount * dayPowerMult + y.maxOutsideEnemyPowerCount * nightPowerMult + y.maxEnemyPowerCount * insidePowerMult +
-                    y.DaytimeEnemies.Count * dayCountMult + y.OutsideEnemies.Count * nightCountMult + y.Enemies.Count * insideCountMult +
-                    y.factorySizeMultiplier * sizeMult + ((int)y.currentWeather + 1) * weatherMult + ((y.minTotalScrapValue + y.maxTotalScrapValue) / 2) * valueMult;
+                if (x.mGrade == "Safe" && y.mGrade != "Safe") return 1;
+                else if (x.mGrade != "Safe" && y.mGrade == "Safe") return -1;
+
+                float xDiff = xDayEPC*dayPowerMult + xOutEPC*nightPowerMult + xInEPC*insidePowerMult + 
+                    xDayEnemies*dayCountMult + xOutEnemies*nightCountMult + xInEnemies*insideCountMult +
+                    xFactSize*sizeMult + (xWeather + 1)*weatherMult + ((xMinScrap + xMaxScrap)/2)*valueMult;
+
+                float yDiff = yDayEPC * dayPowerMult + yOutEPC * nightPowerMult + yInEPC * insidePowerMult +
+                    yDayEnemies * dayCountMult + yOutEnemies * nightCountMult + yInEnemies * insideCountMult +
+                    yFactSize * sizeMult + (yWeather + 1) * weatherMult + ((yMinScrap + yMaxScrap) / 2) * valueMult;
 
                 //mls.LogMessage($"X: {x.PlanetName}, TOTAL DIFFICULTY: {xDiff}");
                 //mls.LogMessage($"Y: {y.PlanetName}, TOTAL DIFFICULTY: {yDiff}");

@@ -25,7 +25,7 @@ namespace TerminalPlus
         public static char padChar = ' ';
         public static int defaultSort;
         public static bool activeKilroy = false;
-        public static bool hiddenCompany = true;
+        public static bool overrideVisibility = false;
         public static bool showClear = false;
         public static bool evenSort = false;
         public static bool longWeather = false;
@@ -37,7 +37,7 @@ namespace TerminalPlus
 
         static ConfigEntry<bool> padPrefixes;
         static ConfigEntry<sortingOptions> defaultSorting;
-        static ConfigEntry<bool> hideCompany;
+        static ConfigEntry<bool> overrideVisibilityConfig;
         static ConfigEntry<bool> showClearConfig;
         static ConfigEntry<bool> longWeatherConfig;
         static ConfigEntry<bool> evenSortConfig;
@@ -59,7 +59,7 @@ namespace TerminalPlus
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
-        [HarmonyPriority(99)]
+        [HarmonyPriority(2)]
         public static void MakeConfig()
         {         
             mls.LogDebug("CONFIG START");
@@ -71,8 +71,8 @@ namespace TerminalPlus
 
             defaultSorting = configFile.Bind("00. General", "Default Sorting", sortingOptions.Default,
                 "The default method for sorting moons in the terminal catalogue.");
-            hideCompany = configFile.Bind("00. General", "Hide The Company", true,
-                "Hides \"71 Gordion\" (The Company Building) from the Moon Catalogue page.");
+            //hideCompanyConfig = configFile.Bind("00. General", "Hide The Company", true,
+            //    "Hides \"71 Gordion\" (The Company Building) from the Moon Catalogue page.");
             padPrefixes = configFile.Bind("00. General", "Pad Prefixes", false,
                 "Pads all prefixes with zeros to be the same length (e.g. \"7 Dine\" would become \"007 Dine\").");
             showClearConfig = configFile.Bind("00. General", "Show Clear Weather", false,
@@ -90,80 +90,95 @@ namespace TerminalPlus
 
             string settingEntryNum;
             originalNames.Clear();
-            Nodes.priceOverride = new bool[Nodes.moonsList.Count];
+            Nodes.priceOverride = new bool[Nodes.moonMasters.Count];
 
-            foreach (SelectableLevel selectableLevel in Nodes.moonsList)
+            foreach (MoonMaster moonCFG in Nodes.moonMasters.Values)
             {
-                mls.LogWarning($"CURRENT LEVEL: {selectableLevel.name}");
+                mls.LogWarning($"CURRENT LEVEL: {moonCFG.mLevelName}");
 
-                int cuID = selectableLevel.levelID;
+                int cuID = moonCFG.mID;
                 int saveID = -1;
                 string tempInfo = "PLACEHOLDER TEXT (could not find info text for config, setting may not work)";
-                string configName = selectableLevel.PlanetName;
+                string configName = moonCFG.origName;
                 if (cuID < 9) { settingEntryNum = $"0{cuID + 1}"; }
                 else { settingEntryNum = $"{cuID + 1}"; }
-                if (int.TryParse(Nodes.moonPrefixes[cuID], out int tempPrefix)) { }
+                if (int.TryParse(moonCFG.mPrefix, out int tempPrefix)) { }
                 else tempPrefix = -1;
-                
-                originalNames.Add(selectableLevel.levelID, selectableLevel.PlanetName);
+
+                //originalNames.Add(selectableLevel.levelID, selectableLevel.PlanetName);
 
                 for (int i = 0; i < infoNodes.Length; i++)
                 {
-                    if (infoNodes[i].displayText.ToLower().StartsWith(selectableLevel.PlanetName.ToLower()) ||
-                        infoNodes[i].displayText.ToLower().StartsWith((Nodes.moonPrefixes[cuID] + "-" + Nodes.moonNames[cuID]).ToLower()) ||
-                        infoNodes[i].displayText.ToLower().StartsWith(Nodes.moonNames[cuID].ToLower()) ||
-                        infoNodes[i].name.ToLower().Contains(Nodes.moonNames[cuID].ToLower()))
+                    if (infoNodes[i].displayText.ToLower().StartsWith(moonCFG.origName.ToLower()) ||
+                        infoNodes[i].displayText.ToLower().StartsWith((moonCFG.mPrefix + "-" + moonCFG.mName).ToLower()) ||
+                        infoNodes[i].displayText.ToLower().StartsWith(moonCFG.mName.ToLower()) ||
+                        infoNodes[i].name.ToLower().Contains(moonCFG.mName.ToLower()))
                     {
                         tempInfo = infoNodes[i].displayText;
                         saveID = i;
                         break;
                     }
                 }
-                if (selectableLevel.name == "CompanyBuildingLevel")
+
+                if (moonCFG.mLevelName == "CompanyBuildingLevel")
                 {
-                    //tempInfo = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode n) => n.name == "CompanyBuildingInfo").FirstOrDefault().displayText;
                     tempInfo = Resources.FindObjectsOfTypeAll<TerminalNode>().FirstOrDefault((TerminalNode n) => n.name == "CompanyBuildingInfo").displayText;
-
                     configName = "The Company Building";
-                }
+                    moonCFG.mName = "Company Building";
+                    moonCFG.mPrefix = "The";
 
-                enableCustom = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    enableCustom = configFile.Bind($"{settingEntryNum}. {configName} Settings",
                         $"{configName} - Enable Moon Config", false, $"Enables the customization options below for {configName}.");
 
-                setCustomName = configFile.Bind($"{settingEntryNum}. {configName} Settings",
-                    $"{configName} - Set Custom Name", Nodes.moonNames[cuID], "Set a custom moon name (not including the prefix).");
-                setCustomPrefix = configFile.Bind($"{settingEntryNum}. {configName} Settings",
-                    $"{configName} - Set Custom Prefix", tempPrefix, $"Set a custom prefix number (e.g. the \"8\" in \"8 Titan\"). Set to \"-1\" to remove prefix entirely.");
+                    overrideVisibility = true;
+                    overrideVisibilityConfig = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Hide Moon in Terminal", true, $"Hides The Company in the moon catalogue. " +
+                        $"Set to \"true\" to hide; visibility may be overridden by other mods .\nNOTE: The moon will still be active and usable, just not visible.");
+                    setCustomName = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Name", "Company Building", "Set a custom moon name (not including the prefix).");
+                    setCustomPrefix = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Prefix", -2, $"Set a custom prefix number (e.g. the \"8\" in \"8 Titan\"). " +
+                        $"Set to \"-1\" to remove prefix entirely. Set to \"-2\" to use \"The\" for \"The Company Building\".");
+                }
+                else
+                {
+                    enableCustom = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Enable Moon Config", false, $"Enables the customization options below for {configName}.");
+
+                    overrideVisibilityConfig = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    $"{configName} - Hide Moon in Terminal", false, $"Hide the moon in the catalogue. " +
+                        $"If true, it will be hidden, if false, it will be whatever it would be without TerminalPlus.\nNOTE: The moon will still be active and usable, just not visible.");
+                    setCustomName = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Name", moonCFG.mName, "Set a custom moon name (not including the prefix).");
+                    setCustomPrefix = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Prefix", tempPrefix, $"Set a custom prefix number (e.g. the \"8\" in \"8 Titan\"). Set to \"-1\" to remove prefix entirely.");
+                }
 
                 setCustomGrade = configFile.Bind($"{settingEntryNum}. {configName} Settings",
-                    $"{configName} - Set Custom Grade", selectableLevel.riskLevel, "Set a custom grade/hazard level (e.g. \"A+\", \"D\", \"SS\", etc). Will be trimmed to two characters.");
+                    $"{configName} - Set Custom Grade", moonCFG.mGrade, "Set a custom grade/hazard level (e.g. \"A+\", \"D\", \"SS\", etc). Will be trimmed to two characters.");
                 setCustomPrice = configFile.Bind($"{settingEntryNum}. {configName} Settings",
-                    $"{configName} - Set Custom Price", Nodes.moonsPrice[cuID], "Set a custom price. Set to \"-1\" to ignore for compatibility with other price-changing mods.\n(NOTE: may break if another mod reassigns level IDs during runtime)");
+                    $"{configName} - Set Custom Price", moonCFG.mPrice, "Set a custom price. Set to \"-1\" to ignore for compatibility with other price-changing mods.\n(NOTE: may break if another mod reassigns level IDs during runtime)");
 
                 setCustomDescription = configFile.Bind($"{settingEntryNum}. {configName} Settings",
-                    $"{configName} - Set Custom Description", selectableLevel.LevelDescription, "Set a custom description (i.e. the \"POPULATION\", \"CONDITIONS\", and \"FAUNA\" subtext).");
+                    $"{configName} - Set Custom Description", moonCFG.mDesc, "Set a custom description (i.e. the \"POPULATION\", \"CONDITIONS\", and \"FAUNA\" subtext).");
                 setCustomInfo = configFile.Bind($"{settingEntryNum}. {configName} Settings",
                     $"{configName} - Set Custom Info Panel", tempInfo, "Set custom info display text (for when you enter \"[moon name] info\" into the terminal)\n(NOTE: may not work on modded moons depending on their default formatting).");
 
-                var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(configFile, null);
-
-                CheckForOrphans(configFile, configName);
-
                 if (enableCustom.Value)
                 {
-                    mls.LogInfo($"Config enabled for {selectableLevel.PlanetName}. Running...");
+                    mls.LogInfo($"Config enabled for {moonCFG.mLevelName}. Running...");
 
-                    Nodes.moonNames[cuID] = setCustomName.Value;
+                    moonCFG.mName = setCustomName.Value;
 
-                    if (setCustomPrefix.Value < 0) Nodes.moonPrefixes[cuID] = string.Empty;
-                    else Nodes.moonPrefixes[cuID] = setCustomPrefix.Value.ToString();
-                    selectableLevel.PlanetName = setCustomPrefix.Value + " " + setCustomName.Value;
-                    selectableLevel.riskLevel = setCustomGrade.Value;
+                    if (setCustomPrefix.Value < 0) moonCFG.mPrefix = string.Empty;
+                    else moonCFG.mPrefix = setCustomPrefix.Value.ToString();
+                    moonCFG.mLevel.PlanetName = setCustomPrefix.Value + " " + setCustomName.Value;
+                    moonCFG.mLevel.riskLevel = moonCFG.mGrade = setCustomGrade.Value;
 
-                    if (setCustomPrice.Value < 0) { Nodes.priceOverride[cuID] = true; setCustomPrice.Value = Nodes.moonsPrice[cuID]; }
-                    else Nodes.priceOverride[cuID] = false;
-                    Nodes.moonsPrice[cuID] = setCustomPrice.Value;
-                    selectableLevel.LevelDescription = setCustomDescription.Value;
+                    if (setCustomPrice.Value < 0) { moonCFG.mPriceOR = true; setCustomPrice.Value = moonCFG.mPrice; }
+                    else moonCFG.mPriceOR = false;
+                    moonCFG.mPrice = setCustomPrice.Value;
+                    moonCFG.mDesc = setCustomDescription.Value;
 
                     foreach (CompatibleNoun nounFinder in Nodes.routeNouns)
                     {
@@ -182,18 +197,21 @@ namespace TerminalPlus
                     {
                         if (confirmNode.buyRerouteToMoon == cuID)
                         {
-                            confirmNode.displayText = $"Routing autopilot to {Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]}.\nYour new balance is [playerCredits].";
+                            confirmNode.displayText = $"Routing autopilot to {moonCFG.mPrefix}-{moonCFG.mName}.\nYour new balance is [playerCredits].";
                             confirmNode.itemCost = setCustomPrice.Value;
                         }
                     }
                     if (saveID >= 0) infoNodes[saveID].displayText = setCustomInfo.Value;
+                    moonCFG.mVis = !overrideVisibilityConfig.Value;
                 }
+                if (moonCFG.mLevelName == "CompanyBuildingLevel" && setCustomPrefix.Value == -2) moonCFG.mPrefix = "The";
+                //var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(configFile, null);
+                CheckForOrphans(configFile, configName);
             }
-            configKilroy = configFile.Bind($"{Nodes.moonsList.Count + 1}. Misc.", "Kilroy", false, "Kilroy is here.");
+            configKilroy = configFile.Bind($"{Nodes.moonMasters.Count + 1}. Misc.", "Kilroy", false, "Kilroy is here.");
             if (padPrefixes.Value) padChar = '0';
             else padChar = ' ';
             defaultSort = (int)defaultSorting.Value;
-            hiddenCompany = hideCompany.Value;
             showClear = showClearConfig.Value;
             evenSort = evenSortConfig.Value;
             longWeather = longWeatherConfig.Value;
@@ -301,13 +319,142 @@ namespace TerminalPlus
         private static void ResetNames()
         {
             mls.LogMessage("Disconnecting and resetting names:");
-            foreach (SelectableLevel slReset in Nodes.moonsList)
+            //foreach (SelectableLevel slReset in Nodes.moonsList)
+            //{
+            //    slReset.PlanetName = originalNames[slReset.levelID];
+            //    mls.LogDebug("Reset: " + slReset.PlanetName);
+            //}
+            foreach (MoonMaster moonRN in Nodes.moonMasters.Values)
             {
-                slReset.PlanetName = originalNames[slReset.levelID];
-                mls.LogDebug("Reset: " + slReset.PlanetName);
+                moonRN.mLevel.PlanetName = moonRN.origName;
+                mls.LogDebug("Reset: " + moonRN.origName);
             }
 
         }
 
     }
 }
+
+
+
+
+
+
+/*foreach (SelectableLevel selectableLevel in Nodes.moonsList)
+            {
+                mls.LogWarning($"CURRENT LEVEL: {selectableLevel.name}");
+
+                int cuID = selectableLevel.levelID;
+                int saveID = -1;
+                string tempInfo = "PLACEHOLDER TEXT (could not find info text for config, setting may not work)";
+                string configName = selectableLevel.PlanetName;
+                if (cuID < 9) { settingEntryNum = $"0{cuID + 1}"; }
+                else { settingEntryNum = $"{cuID + 1}"; }
+                if (int.TryParse(Nodes.moonPrefixes[cuID], out int tempPrefix)) { }
+                else tempPrefix = -1;
+                
+                originalNames.Add(selectableLevel.levelID, selectableLevel.PlanetName);
+
+                for (int i = 0; i < infoNodes.Length; i++)
+                {
+                    if (infoNodes[i].displayText.ToLower().StartsWith(selectableLevel.PlanetName.ToLower()) ||
+                        infoNodes[i].displayText.ToLower().StartsWith((Nodes.moonPrefixes[cuID] + "-" + Nodes.moonNames[cuID]).ToLower()) ||
+                        infoNodes[i].displayText.ToLower().StartsWith(Nodes.moonNames[cuID].ToLower()) ||
+                        infoNodes[i].name.ToLower().Contains(Nodes.moonNames[cuID].ToLower()))
+                    {
+                        tempInfo = infoNodes[i].displayText;
+                        saveID = i;
+                        break;
+                    }
+                }
+                //if (selectableLevel.name == "CompanyBuildingLevel")
+                //{
+                //    //tempInfo = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode n) => n.name == "CompanyBuildingInfo").FirstOrDefault().displayText;
+                //    tempInfo = Resources.FindObjectsOfTypeAll<TerminalNode>().FirstOrDefault((TerminalNode n) => n.name == "CompanyBuildingInfo").displayText;
+                //    configName = "The Company Building";
+                //}
+
+                enableCustom = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Enable Moon Config", false, $"Enables the customization options below for {configName}.");
+                
+                if (selectableLevel.name == "CompanyBuildingLevel")
+                {
+                    tempInfo = Resources.FindObjectsOfTypeAll<TerminalNode>().FirstOrDefault((TerminalNode n) => n.name == "CompanyBuildingInfo").displayText;
+                    configName = "The Company Building";
+                    Nodes.moonNames[cuID] = "Company Building";
+                    Nodes.moonPrefixes[cuID] = "The";
+
+                    overrideVisibility = true;
+                    overrideVisibilityConfig = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Hide Moon in Terminal", true, $"Override the moon visibility in the catalogue. " +
+                        $"If true, it will be hidden, if false, it will be whatever it would be without TerminalPlus.\nNOTE: The moon will still be active and usable, just not visible.");
+                    setCustomName = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Name", "Company Building", "Set a custom moon name (not including the prefix).");
+                    setCustomPrefix = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Prefix", -2, $"Set a custom prefix number (e.g. the \"8\" in \"8 Titan\"). " +
+                        $"Set to \"-1\" to remove prefix entirely. Set to \"-2\" to use \"The\" for \"The Company Building\".");
+                }
+                else
+                {
+                    overrideVisibilityConfig = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    $"{configName} - Hide Moon in Terminal", false, $"Override the moon visibility in the catalogue. " +
+                        $"If true, it will be hidden, if false, it will be whatever it would be without TerminalPlus.\nNOTE: The moon will still be active and usable, just not visible.");
+                    setCustomName = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Name", Nodes.moonNames[cuID], "Set a custom moon name (not including the prefix).");
+                    setCustomPrefix = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                        $"{configName} - Set Custom Prefix", tempPrefix, $"Set a custom prefix number (e.g. the \"8\" in \"8 Titan\"). Set to \"-1\" to remove prefix entirely.");
+                }
+                setCustomGrade = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    $"{configName} - Set Custom Grade", selectableLevel.riskLevel, "Set a custom grade/hazard level (e.g. \"A+\", \"D\", \"SS\", etc). Will be trimmed to two characters.");
+                setCustomPrice = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    $"{configName} - Set Custom Price", Nodes.moonsPrice[cuID], "Set a custom price. Set to \"-1\" to ignore for compatibility with other price-changing mods.\n(NOTE: may break if another mod reassigns level IDs during runtime)");
+
+                setCustomDescription = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    $"{configName} - Set Custom Description", selectableLevel.LevelDescription, "Set a custom description (i.e. the \"POPULATION\", \"CONDITIONS\", and \"FAUNA\" subtext).");
+                setCustomInfo = configFile.Bind($"{settingEntryNum}. {configName} Settings",
+                    $"{configName} - Set Custom Info Panel", tempInfo, "Set custom info display text (for when you enter \"[moon name] info\" into the terminal)\n(NOTE: may not work on modded moons depending on their default formatting).");
+
+                var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(configFile, null);
+                CheckForOrphans(configFile, configName);
+
+                if (enableCustom.Value)
+                {
+                    mls.LogInfo($"Config enabled for {selectableLevel.PlanetName}. Running...");
+
+                    Nodes.moonNames[cuID] = setCustomName.Value;
+
+                    if (setCustomPrefix.Value < 0) Nodes.moonPrefixes[cuID] = string.Empty;
+                    else Nodes.moonPrefixes[cuID] = setCustomPrefix.Value.ToString();
+                    selectableLevel.PlanetName = setCustomPrefix.Value + " " + setCustomName.Value;
+                    selectableLevel.riskLevel = setCustomGrade.Value;
+
+                    if (setCustomPrice.Value < 0) { Nodes.priceOverride[cuID] = true; setCustomPrice.Value = Nodes.moonsPrice[cuID]; }
+                    else Nodes.priceOverride[cuID] = false;
+                    Nodes.moonsPrice[cuID] = setCustomPrice.Value;
+                    selectableLevel.LevelDescription = setCustomDescription.Value;
+
+                    foreach (CompatibleNoun nounFinder in Nodes.routeNouns)
+                    {
+                        if (nounFinder.result.displayPlanetInfo == cuID)
+                        {
+                            nounFinder.noun.word = setCustomName.Value.ToLower();
+                            //if (Nodes.moonPrefixes[cuID].Length > 0)
+                            //{
+                            //    nounFinder.result.displayText = $"The cost to route to {Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
+                            //}
+                            //else nounFinder.result.displayText = $"The cost to route to {Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
+                            nounFinder.result.itemCost = setCustomPrice.Value;
+                        }
+                    }
+                    foreach (TerminalNode confirmNode in Nodes.confirmNodes)
+                    {
+                        if (confirmNode.buyRerouteToMoon == cuID)
+                        {
+                            confirmNode.displayText = $"Routing autopilot to {Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]}.\nYour new balance is [playerCredits].";
+                            confirmNode.itemCost = setCustomPrice.Value;
+                        }
+                    }
+                    if (saveID >= 0) infoNodes[saveID].displayText = setCustomInfo.Value;
+                }
+                if (selectableLevel.name == "CompanyBuildingLevel" && setCustomPrefix.Value == -2) Nodes.moonPrefixes[cuID] = "The";
+            }*/
