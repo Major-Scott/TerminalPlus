@@ -155,7 +155,7 @@ namespace TerminalPlus
                 else moonMCS.dispGrade = moonMCS.mGrade.Length <= 2 || moonMCS.mGrade == "Safe" ? moonMCS.mGrade.PadRight(3).PadLeft(4) : moonMCS.mGrade.Substring(0, 2).PadRight(3).PadLeft(4);
                 //moonMCS.dispGrade = moonMCS.dispGrade.Length <= 2 || moonMCS.dispGrade == "Safe" ? moonMCS.dispGrade.PadRight(3).PadLeft(4) : moonMCS.dispGrade.Substring(0, 2).PadRight(3).PadLeft(4);
 
-                if (moonMCS.mLevelName == "CompanyBuildingLevel" && moonMCS.mName == "Company Building") moonMCS.dispName = "Company<space=0.5en>Building<space=-0.5en>";
+                if (moonMCS.mLevelName == "CompanyBuildingLevel" && moonMCS.mName == "Company Building") moonMCS.dispName = "Company<space=0.3en>Building<space=-0.3en>";
             }
             masterList = moonMasters.Values.ToList();
 

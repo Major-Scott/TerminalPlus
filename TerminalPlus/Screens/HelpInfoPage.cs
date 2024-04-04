@@ -11,13 +11,13 @@ namespace TerminalPlus
         {
             StringBuilder pageChart = new StringBuilder();
 
-            pageChart.AppendLine("\n\n>MOONS\nTo see the list of moons your ship can route to.\n");
+            pageChart.AppendLine(">MOONS\nTo see the list of moons your ship can route to.\n");
             pageChart.AppendLine(">STORE\nTo see The Company Store's selection of items.\n");
             pageChart.AppendLine(">BESTIARY\nTo see the list of wildlife on record.\n");
             pageChart.AppendLine(">STORAGE\nTo access objects placed into storage.\n");
             pageChart.AppendLine(">SORT [sort setting]\nTo sort the moon catalogue by one of several possible settings. Type \"sort info\" for settings.\n");
             pageChart.AppendLine(">REVERSE [sort setting]\nTo sort and reverse the moon catalogue. \n");
-            pageChart.AppendLine(">OTHER\nTo see the list of other commands.");
+            pageChart.AppendLine(">OTHER\nTo see the list of other commands.\n");
 
             return pageChart.ToString();
         }

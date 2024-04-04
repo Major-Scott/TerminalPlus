@@ -30,7 +30,8 @@ namespace TerminalPlus
         public static bool evenSort = false;
         public static bool longWeather = false;
         public static bool detailedScan = true;
-        public static SelectableLevel companyLocation;
+        public static bool showLGUStore = false;
+        //public static SelectableLevel companyLocation;
         private static readonly Dictionary<int, string> originalNames = new Dictionary<int, string>();
 
         static ConfigEntry<bool> enableCustom;
@@ -43,6 +44,7 @@ namespace TerminalPlus
         static ConfigEntry<bool> evenSortConfig;
         static ConfigEntry<bool> detailedScanConfig;
         static ConfigEntry<string> customDifficultyConfig;
+        static ConfigEntry<bool> showLGUStoreConfig;
         static ConfigEntry<bool> configKilroy;
         
         static ConfigEntry<string> setCustomName;
@@ -84,9 +86,12 @@ namespace TerminalPlus
             detailedScanConfig = configFile.Bind("00. General", "Detailed Terminal Scan", true,
                 "Displays a more detailed  \"scan\" terminal page including a list of all items and their most important properties.");
             customDifficultyConfig = configFile.Bind("00. General", "Custom Difficulty Equation", "DayPower:2,NightPower:4,InsidePower:5,Size:2,Weather:3",
-                "Creates a custom equation on which the \"difficulty\" sorting method is calculated.\nPOSSIBLE VARIABLES:\nDayPower (daytime enemy power), NightPower (nighttime enemy power)," +
-                " InsidePower (inside enemy power),\nDayEnemies (total daytime enemy types), NightEnemies (total nighttime enemy types), InsideEnemies (total inside enemy types)," +
-                "\nSize (facility/interior size), Weather (current weather), Value (average scrap value)\nPlease provide variables in the \"variable:weight\" format shown in the default.");
+                "Creates a custom equation on which the \"difficulty\" sorting method is calculated. Please provide variables in the \"variable:weight\" format shown in the default." +
+                " POSSIBLE VARIABLES:\nDayPower (daytime enemy power), NightPower (nighttime enemy power), InsidePower (inside enemy power),\nDayEnemies (total daytime enemy types)," +
+                " NightEnemies (total nighttime enemy types), InsideEnemies (total inside enemy types)," +
+                "\nSize (facility/interior size), Weather (current weather), Value (average scrap value)");
+            showLGUStoreConfig = configFile.Bind("00. General", "Show LGU Upgrades in Store", false,
+                "Shows the \"LateGameUpgrades\" mod's upgrades in the main store. Only applicable if LGU is installed.");
 
             string settingEntryNum;
             originalNames.Clear();
@@ -197,7 +202,7 @@ namespace TerminalPlus
                             //    nounFinder.result.displayText = $"The cost to route to {Nodes.moonPrefixes[cuID]}-{Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
                             //}
                             //else nounFinder.result.displayText = $"The cost to route to {Nodes.moonNames[cuID]} is [totalCost]. It is currently [currentPlanetTime] on this moon.\n\nPlease CONFIRM or DENY.";
-                            nounFinder.result.itemCost = setCustomPrice.Value;
+                            if (!moonCFG.mPriceOR) nounFinder.result.itemCost = setCustomPrice.Value;
                         }
                     }
                     foreach (TerminalNode confirmNode in Nodes.confirmNodes)
@@ -205,7 +210,7 @@ namespace TerminalPlus
                         if (confirmNode.buyRerouteToMoon == cuID)
                         {
                             confirmNode.displayText = $"Routing autopilot to {moonCFG.mPrefix}-{moonCFG.mName}.\nYour new balance is [playerCredits].";
-                            confirmNode.itemCost = setCustomPrice.Value;
+                            if (!moonCFG.mPriceOR) confirmNode.itemCost = setCustomPrice.Value;
                         }
                     }
                     if (saveID >= 0) infoNodes[saveID].displayText = setCustomInfo.Value;
@@ -224,10 +229,16 @@ namespace TerminalPlus
             longWeather = longWeatherConfig.Value;
             detailedScan = detailedScanConfig.Value;
             mls.LogInfo($"Default sorting method: {defaultSorting.Value}");
-
+            
             var orphanedEntries2 = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(configFile, null);
-            if (orphanedEntries2.Where(e => e.Key.Key == "Kilroy" && e.Value == "true") != null) configKilroy.Value = true;
+
+            if (orphanedEntries2.Where(e => e.Key.Key == "Kilroy" && e.Value == "true").Count() > 0)
+            {
+                mls.LogInfo($"Active orphaned entry for Kilroy. Replacing...");
+                configKilroy.Value = true;
+            }
             activeKilroy = configKilroy.Value;
+
             CalculateDifficulty();
 
             orphanedEntries2.Clear();
@@ -239,6 +250,11 @@ namespace TerminalPlus
         public static void CheckForOrphans(ConfigFile configFile, string configName)
         {
             var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(configFile, null);
+
+            //foreach (var entry2 in orphanedEntries)
+            //{
+            //    mls.LogMessage("ORPHAN: " + entry2.Key.Key);
+            //}
 
             if (orphanedEntries.Where(c => c.Key.Key == $"{configName} - Enable Moon Config").FirstOrDefault().Value == "true")
             {

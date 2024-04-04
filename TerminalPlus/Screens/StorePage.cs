@@ -91,7 +91,7 @@ namespace TerminalPlus
                     pageChart.AppendLine($"  ║ {upgradeName} |<cspace=-2> $</cspace>{upgradePrice}<cspace=-0.6> |</cspace>     |          ║");
                 }
             }
-            if (PluginMain.LGUExists) pageChart.Append(LGU.LGUCompatibility.LGUString());
+            if (PluginMain.LGUExists && ConfigManager.showLGUStore) pageChart.Append(LGU.LGUCompatibility.LGUString());
 
             pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣");
 

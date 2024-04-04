@@ -23,13 +23,23 @@ namespace TerminalPlus
         // 4. MoonCatalogueSetup
         // 5. CreateNodes
 
+        [HarmonyPatch("Start")]
+        [HarmonyPostfix]
+        [HarmonyPriority(Priority.First)]
+        public static void PatchHelpPage()
+        {
+            terminal.terminalNodes.specialNodes[13].displayText = new Nodes().MainHelpPage();
+            terminal.screenText.caretBlinkRate = 1f; //__instance.screenText.caretBlinkRate = 1f;
+        }
+
         [HarmonyPostfix]
         [HarmonyPatch("ParsePlayerSentence")]
         public static void ParsePatch(Terminal __instance)
         {
-            //PluginMain.mls.LogDebug("PARSEPLAYER PATCH");
             playerSubmit = __instance.screenText.text.Substring(__instance.screenText.text.Length - __instance.textAdded);
+            mls.LogDebug("Player entered: " + playerSubmit);
         }
+
         [HarmonyPostfix]
         [HarmonyPriority(Priority.Last)]
         [HarmonyPatch("RunTerminalEvents")]
@@ -37,9 +47,17 @@ namespace TerminalPlus
         {
             string newDisplayText = null;
             if (node == null) return;
-
-            if (node == terminal.terminalNodes.specialNodes[13]) newDisplayText = new Nodes().MainHelpPage();
-            else if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
+          
+            //if (node == terminal.terminalNodes.specialNodes[13])
+            //{
+            //    HelpTest();
+            //    //__instance.screenText.text = terminal.terminalNodes.specialNodes[13].displayText + new Nodes().MainHelpPage();  //newDisplayText = new Nodes().MainHelpPage();
+            //    //__instance.currentText = terminal.terminalNodes.specialNodes[13].displayText + new Nodes().MainHelpPage();
+            //    //mls.LogMessage(terminal.terminalNodes.specialNodes[13].displayText);
+            //    //mls.LogMessage("--------------------------------------");
+            //    //mls.LogMessage(__instance.terminalNodes.specialNodes[13].displayText);
+            //}
+            if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
 
             else if (node.name == "MoonsCatalogue" || node.name.Contains("TPsort"))
             {
@@ -92,7 +110,7 @@ namespace TerminalPlus
                     if (catalogueSort.Contains('⇧')) catalogueSort = catalogueSort.Substring(0, 11) + '⇩';
                     else catalogueSort = catalogueSort.Substring(0, 11) + '⇧';
                 }
-                else PluginMain.mls.LogInfo($"not reverse :(");
+                else PluginMain.mls.LogDebug($"not reverse :(");
 
                 newDisplayText = new Nodes().MoonsPage();
             }
@@ -104,7 +122,6 @@ namespace TerminalPlus
 
             if (newDisplayText != null)
             {
-                __instance.screenText.caretBlinkRate = 2f;
                 __instance.screenText.textComponent.enableKerning = false;
                 __instance.screenText.textComponent.enableWordWrapping = false;
 

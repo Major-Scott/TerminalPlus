@@ -23,12 +23,6 @@ namespace TerminalPlus
         public static void ModdedWeathers()
         {
             PluginMain.mls.LogDebug("LLL exists, grabbing it's weather info...");
-            //moddedWeathers = new string[moonsMaster.Count];
-            //for (int i = 0; i < moonsMaster.Count; i++)
-            //{
-            //    moddedWeathers[i] = typeof(TerminalManager).GetMethod("GetWeatherConditions", BindingFlags.Static | BindingFlags.NonPublic).Invoke
-            //        (null, new object[1] { moonsMaster[i] }).ToString().Replace("(", string.Empty).Replace(")", string.Empty);
-            //}
 
             foreach (MoonMaster moon in moonMasters.Values)
             {
