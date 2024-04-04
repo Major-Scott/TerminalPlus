@@ -26,7 +26,7 @@ namespace TerminalPlus
 
         public string dispName = string.Empty;
         public string dispPrefix = string.Empty;
-        public string dispGrade;
+        public string dispGrade = string.Empty;
         public string dispWeather;
         public string halfWeather = string.Empty;
 
@@ -37,7 +37,7 @@ namespace TerminalPlus
             origName = moon.PlanetName;
             mID = moon.levelID;
             mWeather = dispWeather = moon.currentWeather.ToString();
-            mGrade = dispGrade = moon.riskLevel;
+            mGrade = moon.riskLevel;
             mDesc = moon.LevelDescription;
         }
     }
@@ -151,8 +151,9 @@ namespace TerminalPlus
                 if (isLongPrefix) { moonMCS.dispPrefix = moonMCS.mPrefix.Length <= 4 ? moonMCS.mPrefix.PadLeft(4, ConfigManager.padChar) : moonMCS.mPrefix.Substring(0, 4); }
                 else { moonMCS.dispPrefix = moonMCS.mPrefix.Length <= 3 ? moonMCS.mPrefix.PadLeft(3, ConfigManager.padChar) : moonMCS.mPrefix.Substring(0, 3); }
 
-                if (moonMCS.dispGrade.ToLower() == "unknown") moonMCS.dispGrade = "??";
-                moonMCS.dispGrade = moonMCS.dispGrade.Length <= 2 || moonMCS.dispGrade == "Safe" ? moonMCS.dispGrade.PadRight(3).PadLeft(4) : moonMCS.dispGrade.Substring(0, 2).PadRight(3).PadLeft(4);
+                if (moonMCS.mGrade.ToLower() == "unknown") moonMCS.dispGrade = " ?? ";
+                else moonMCS.dispGrade = moonMCS.mGrade.Length <= 2 || moonMCS.mGrade == "Safe" ? moonMCS.mGrade.PadRight(3).PadLeft(4) : moonMCS.mGrade.Substring(0, 2).PadRight(3).PadLeft(4);
+                //moonMCS.dispGrade = moonMCS.dispGrade.Length <= 2 || moonMCS.dispGrade == "Safe" ? moonMCS.dispGrade.PadRight(3).PadLeft(4) : moonMCS.dispGrade.Substring(0, 2).PadRight(3).PadLeft(4);
 
                 if (moonMCS.mLevelName == "CompanyBuildingLevel" && moonMCS.mName == "Company Building") moonMCS.dispName = "Company<space=0.5en>Building<space=-0.5en>";
             }

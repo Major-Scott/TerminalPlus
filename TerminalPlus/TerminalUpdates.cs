@@ -23,15 +23,14 @@ namespace TerminalPlus
         public static void TermUpdate()
         {
             mls.LogInfo("Updating Moon Catalogue...");
-            foreach (SelectableLevel slUpdate in moonsList)
+            foreach (MoonMaster moonTU in moonMasters.Values)
             {
-                mls.LogInfo($"current moon: {slUpdate.PlanetName}");
+                mls.LogInfo($"current moon: {moonTU.mName}");
 
-                if (priceOverride[slUpdate.levelID] == true)
+                if (moonTU.mPriceOR == true)
                 {
                     mls.LogDebug("PRICE OVERRIDE ACTIVE");
-                    //moonsPrice[slUpdate.levelID] = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode k) => k.buyRerouteToMoon == slUpdate.levelID).FirstOrDefault().itemCost;
-                    //moonsPrice[slUpdate.levelID] = Resources.FindObjectsOfTypeAll<TerminalNode>().FirstOrDefault((TerminalNode k) => k.buyRerouteToMoon == slUpdate.levelID).itemCost;
+                    moonTU.mPrice = routeNouns.FirstOrDefault(n => n.result.displayPlanetInfo == moonTU.mID).result.itemCost;
                 }
                 UpdateMoonWeather();
             }

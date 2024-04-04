@@ -175,9 +175,16 @@ namespace TerminalPlus
                     moonCFG.mLevel.PlanetName = setCustomPrefix.Value + " " + setCustomName.Value;
                     moonCFG.mLevel.riskLevel = moonCFG.mGrade = setCustomGrade.Value;
 
-                    if (setCustomPrice.Value < 0) { moonCFG.mPriceOR = true; setCustomPrice.Value = moonCFG.mPrice; }
-                    else moonCFG.mPriceOR = false;
-                    moonCFG.mPrice = setCustomPrice.Value;
+                    //if (setCustomPrice.Value < 0) { moonCFG.mPriceOR = true; setCustomPrice.Value = moonCFG.mPrice; }
+                    //else moonCFG.mPriceOR = false;
+                    //moonCFG.mPrice = setCustomPrice.Value;
+
+                    if (setCustomPrice.Value >= 0) {
+                        moonCFG.mPriceOR = false;
+                        moonCFG.mPrice = setCustomPrice.Value;
+                    }
+                    else moonCFG.mPriceOR = true;
+
                     moonCFG.mDesc = setCustomDescription.Value;
 
                     foreach (CompatibleNoun nounFinder in Nodes.routeNouns)

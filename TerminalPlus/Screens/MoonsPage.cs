@@ -72,7 +72,7 @@ namespace TerminalPlus
 
             pageChart.AppendLine("  ╠═══════════════════════════════════════════════╣");
             pageChart.AppendLine($"  ║    The Company is currently buying at {((int)(StartOfRound.Instance.companyBuyingRate * 100)).ToString() + "%",-5}   ║");
-            pageChart.AppendLine("  ║        -------------------------------        ║");
+            pageChart.AppendLine("  ║           -------------------------           ║");
             pageChart.AppendLine($"  ║  You have {(int)Mathf.Floor(TimeOfDay.Instance.timeUntilDeadline / TimeOfDay.Instance.totalTime)} days left to complete your quota  ║");
             pageChart.AppendLine("  ╚═══════════════════════════════════════════════╝");
 
