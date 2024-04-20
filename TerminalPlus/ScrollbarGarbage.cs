@@ -95,20 +95,16 @@ namespace TerminalPlus
                     currentScrollPosition = 1f;
                     currentStep = loopCount = 0;
                     ___m_Content.anchoredPosition = Vector2.zero;
-                    mls.LogDebug("SUBMIT LOOP");
                 }
                 else if (terminalKeyPressed)
                 {
                     currentScrollPosition = 0f;
                     currentStep = totalSteps;
-                    mls.LogDebug("TYPING LOOP");
                 }
                 else
                 {
                     currentScrollPosition = Mathf.Clamp01(1f - ((float)currentStep / totalSteps));
-                    mls.LogDebug("NORMAL LOOP");
                 }
-                mls.LogDebug($"STEP {currentStep} of {totalSteps} - currentValue = {currentScrollPosition}");
 
                 __instance.verticalNormalizedPosition = currentScrollPosition;
             }
