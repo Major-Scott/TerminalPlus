@@ -24,7 +24,7 @@ namespace TerminalPlus
         [HarmonyPostfix]
         public static void Ssdfdwesasd(float input, bool sendCallback)
         {
-            if (terminal.terminalInUse)
+            if (terminal != null && terminal.terminalInUse)
             {
                 StackTrace stackTrace = new StackTrace();
 
@@ -39,7 +39,7 @@ namespace TerminalPlus
         [HarmonyPostfix]
         public static void TUPatch(ref float ___timeSinceLastKeyboardPress, Terminal __instance)
         {
-            if (terminal.terminalInUse)
+            if (__instance.terminalInUse)
             {
                 __instance.scrollBarCanvasGroup.alpha = 1;
                 terminalKeyPressed = ___timeSinceLastKeyboardPress < 0.08;
@@ -68,7 +68,7 @@ namespace TerminalPlus
         [HarmonyPostfix]
         public static void ScrollTest(Vector2 offset, ref Bounds ___m_ContentBounds, ref Bounds ___m_ViewBounds, ref RectTransform ___m_Content, ref Vector2 ___m_PrevPosition, ScrollRect __instance)
         {
-            if (terminal.terminalInUse)
+            if (terminal != null && terminal.terminalInUse)
             {
                 __instance.verticalScrollbarVisibility = ScrollbarVisibility.AutoHideAndExpandViewport;
 
@@ -95,20 +95,16 @@ namespace TerminalPlus
                     currentScrollPosition = 1f;
                     currentStep = loopCount = 0;
                     ___m_Content.anchoredPosition = Vector2.zero;
-                    mls.LogDebug("SUBMIT LOOP");
                 }
                 else if (terminalKeyPressed)
                 {
                     currentScrollPosition = 0f;
                     currentStep = totalSteps;
-                    mls.LogDebug("TYPING LOOP");
                 }
                 else
                 {
                     currentScrollPosition = Mathf.Clamp01(1f - ((float)currentStep / totalSteps));
-                    mls.LogDebug("NORMAL LOOP");
                 }
-                mls.LogDebug($"STEP {currentStep} of {totalSteps} - currentValue = {currentScrollPosition}");
 
                 __instance.verticalNormalizedPosition = currentScrollPosition;
             }

@@ -21,8 +21,7 @@ namespace TerminalPlus
         // By Price: moonsList.Sort((x, y) => moonsPrice[x.levelID].CompareTo(moonsPrice[y.levelID]));
         // By Weather: moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
 
-        public static readonly Terminal terminal = UnityEngine.Object.FindAnyObjectByType<Terminal>();
-        public static readonly ScrollRect scrollRect = UnityEngine.Object.FindAnyObjectByType<ScrollRect>();
+        public static Terminal terminal = UnityEngine.Object.FindAnyObjectByType<Terminal>();
         private static string[] nounTPList = new string[0];
 
         public static int dayPowerMult = 0;
