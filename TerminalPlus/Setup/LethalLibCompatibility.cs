@@ -8,9 +8,7 @@ using LethalLib;
 using LethalLib.Modules;
 using UnityEngine;
 using static LethalLib.Modules.Items;
-using On;
 using static TerminalPlus.Nodes;
-using static UnityEngine.Rendering.HighDefinition.CameraSettings;
 
 namespace TerminalPlus.Mods
 {
@@ -18,28 +16,14 @@ namespace TerminalPlus.Mods
     {
         public static List<ShopItem> modItems = new List<ShopItem>();
 
-        //[HarmonyPatch(typeof(Items), "Terminal_Awake")]
-        //[HarmonyPrefix]
-        //public static void VisibleItems(On.Terminal.orig_Awake orig, Terminal self)
-        //{
-        //    mls.LogWarning("in da loooooooooop");
-
-        //    modItems.Clear();
-        //    foreach (ShopItem shopItem in shopItems) modItems.Add(shopItem);
-        //    modItems.Sort((x, y) => x.item.itemName.CompareTo(y.item.itemName));
-        //    //storeItems = ___shopItems.OrderBy(x => x.item.itemName).;
-        //    foreach (ShopItem item in modItems) mls.LogMessage("PATCHITEM: " + item.item.itemName);
-        //    //storeDecorations = Items.terminal.ShipDecorSelection.OrderBy(x => x.creatureName).ToList();
-        //}
         public static void RemoveHiddenStoreItems(Terminal terminal)
         {
             modItems.Clear();
             foreach (ShopItem shopItem in shopItems) modItems.Add(shopItem);
-            //storeItems = storeItems.Count <= 0 ? terminal.buyableItemsList.OrderBy(x => x.itemName).ToList() : storeItems;
             foreach (ShopItem shopItem in modItems)
             {
                 mls.LogDebug("PATCHITEM: " + shopItem.item.itemName);
-                mls.LogDebug("ENABLED?: " + !shopItem.wasRemoved);
+                mls.LogDebug(" ENABLED?: " + !shopItem.wasRemoved);
 
                 if (storeItems.Contains(shopItem.item) && shopItem.wasRemoved) storeItems.Remove(shopItem.item);
 

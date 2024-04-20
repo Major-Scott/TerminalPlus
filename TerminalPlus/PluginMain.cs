@@ -9,6 +9,7 @@ using UnityEditor;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using TerminalPlus.Mods;
+using UnityEngine;
 
 namespace TerminalPlus
 {
@@ -23,7 +24,7 @@ namespace TerminalPlus
         internal static bool LethalLibExists = false;
         internal static bool LGUExists = false;
         public static string PluginPath { get; }
-        
+
         void Awake()
         {
             if (instance == null) { instance = this; }

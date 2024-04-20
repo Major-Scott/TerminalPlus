@@ -40,14 +40,13 @@ namespace TerminalPlus
                 int percentSale = terminal.itemSalesPercentages[terminal.buyableItemsList.ToList().IndexOf(item)];
                 string itemSale = $"{100 - percentSale}%".PadLeft(3);
                 if (itemSale == " 0%") itemSale = "   ";
-                else if (itemSale == "100%") itemSale = "$$$";
+                else if (itemSale == "100%") itemSale = "X$X";
                 int itemPrice = (int)Math.Round(item.creditsWorth * (percentSale / 100f));
                 if (itemPrice > 9999) itemPrice = 9999;
-
                 int numOnShip = instanceOnShip.FindAll(x => x.itemProperties.itemName == item.itemName).Count;
 
                 string displayNumOnShip = numOnShip.ToString();
-                if (numOnShip > 99) displayNumOnShip = "+! Owned";
+                if (numOnShip > 99) displayNumOnShip = "Over 100";
                 else if (numOnShip <= 0) displayNumOnShip = "        ";
                 else if (numOnShip < 10) displayNumOnShip = numOnShip.ToString().PadLeft(2, '0') + " Owned";
                 else displayNumOnShip = numOnShip.ToString().PadRight(2) + " Owned";

@@ -7,6 +7,7 @@ using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
+using UnityEngine.UI;
 using static TerminalPlus.Nodes;
 
 namespace TerminalPlus
@@ -15,6 +16,9 @@ namespace TerminalPlus
     public class TerminalPatches
     {
         public static string playerSubmit = string.Empty;
+        public static TextMeshProUGUI terminalClock = new TextMeshProUGUI();
+        public static Transform clockBG;
+        public static float timeSinceSubmit = 0f;
 
         // EXECUTION ORDER:
         // 1. PatchMoonInfo
@@ -23,13 +27,28 @@ namespace TerminalPlus
         // 4. MoonCatalogueSetup
         // 5. CreateNodes
 
+
         [HarmonyPatch("Start")]
         [HarmonyPostfix]
         [HarmonyPriority(Priority.First)]
-        public static void PatchHelpPage()
+        public static void PatchHelpPage(Terminal __instance)
         {
-            terminal.terminalNodes.specialNodes[13].displayText = new Nodes().MainHelpPage();
-            terminal.screenText.caretBlinkRate = 1f; //__instance.screenText.caretBlinkRate = 1f;
+            //terminal.terminalNodes.specialNodes[13].displayText = new Nodes().MainHelpPage();
+            //terminal.screenText.caretBlinkRate = 1f; //__instance.screenText.caretBlinkRate = 1f;
+            __instance.scrollBarCanvasGroup.transform.localPosition = new Vector3(246, 196.5f, 0); // default: 245ish, 208ish, 0
+            Resources.FindObjectsOfTypeAll<TerminalNode>().FirstOrDefault(tn => tn.name == "OtherCommands").displayText = new Nodes().OtherHelpPage();
+
+            terminalClock = UnityEngine.Object.Instantiate(terminal.topRightText);
+            clockBG = UnityEngine.Object.Instantiate(terminal.topRightText.transform.parent.GetChild(5));
+
+            terminalClock.transform.parent = clockBG.parent = __instance.topRightText.transform.parent;
+            terminalClock.text = string.Empty;
+            terminalClock.horizontalAlignment = HorizontalAlignmentOptions.Right;
+            terminalClock.alignment = TextAlignmentOptions.TopRight;
+            terminalClock.transform.localPosition = new Vector3(132f, 199f, -1f);
+            terminalClock.transform.localRotation = clockBG.localRotation = new Quaternion(0f, 0f, 0f, 1f);
+            terminalClock.transform.localScale = Vector3.one;
+            clockBG.localScale = Vector3.zero;
         }
 
         [HarmonyPostfix]
@@ -38,6 +57,25 @@ namespace TerminalPlus
         {
             playerSubmit = __instance.screenText.text.Substring(__instance.screenText.text.Length - __instance.textAdded);
             mls.LogDebug("Player entered: " + playerSubmit);
+            mls.LogWarning("----------PARSEPLAYER----------");
+        }
+
+        [HarmonyPatch("OnSubmit")]
+        [HarmonyPostfix]
+        [HarmonyPriority(Priority.Last)]
+        public static void NodeConsoleInfo(Terminal __instance)
+        {
+            timeSinceSubmit = 0f;
+            __instance.scrollBarVertical.value = 1f;
+
+            //if (__instance.currentNode != null)
+            //{
+            //    mls.LogWarning("CURRENT NODE: " + __instance.currentNode);
+            //    mls.LogWarning("CURRENT NAME: " + __instance.currentNode.name);
+            //    mls.LogMessage("NODE CNAME: " + __instance.currentNode.creatureName);
+            //    mls.LogMessage("  NODE CID: " + __instance.currentNode.creatureFileID);
+            //    if (__instance.currentNode.displayVideo != null) mls.LogMessage("NODE VIDEO: " + __instance.currentNode.displayVideo.name);
+            //}
         }
 
         [HarmonyPostfix]
@@ -47,18 +85,8 @@ namespace TerminalPlus
         {
             string newDisplayText = null;
             if (node == null) return;
-          
-            //if (node == terminal.terminalNodes.specialNodes[13])
-            //{
-            //    HelpTest();
-            //    //__instance.screenText.text = terminal.terminalNodes.specialNodes[13].displayText + new Nodes().MainHelpPage();  //newDisplayText = new Nodes().MainHelpPage();
-            //    //__instance.currentText = terminal.terminalNodes.specialNodes[13].displayText + new Nodes().MainHelpPage();
-            //    //mls.LogMessage(terminal.terminalNodes.specialNodes[13].displayText);
-            //    //mls.LogMessage("--------------------------------------");
-            //    //mls.LogMessage(__instance.terminalNodes.specialNodes[13].displayText);
-            //}
-            if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
 
+            if (node.name == "helpTPsortNode" || node.name == "infoTPsortNode") newDisplayText = new Nodes().HelpInfoPage();
             else if (node.name == "MoonsCatalogue" || node.name.Contains("TPsort"))
             {
                 switch (node.terminalEvent)
@@ -117,8 +145,9 @@ namespace TerminalPlus
             else if (node.name == "0_StoreHub") newDisplayText = new Nodes().StorePage(__instance);
             else if (node.name == "ScanInfo") newDisplayText = new Nodes().ScanMoonPage();
             else if (node.name == "scanShipNode") newDisplayText = new Nodes().ScanShipPage();
-            else if (node.displayPlanetInfo >= 0 && node.name.ToLower().Contains("route")) newDisplayText = new Nodes().RoutePage(node, __instance);
+            else if (node.displayPlanetInfo >= 0 && node.name.ToLower().Contains("route") && moonMasters[node.displayPlanetInfo] != null) newDisplayText = new Nodes().RoutePage(node, __instance);
             else if (node.name == "CancelRoute") newDisplayText = "\n\n\nThe reroute has been cancelled.\n\n";
+            //else if (node.name == "OtherCommands") newDisplayText = new Nodes().OtherHelpPage();
 
             if (newDisplayText != null)
             {

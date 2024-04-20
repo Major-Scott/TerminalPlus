@@ -13,7 +13,6 @@ namespace TerminalPlus
         public string RoutePage(TerminalNode terminalNode, Terminal terminal)
         {
             StringBuilder pageChart = new StringBuilder();
-            //int routeID = terminalNode.displayPlanetInfo;
 
             MoonMaster currentMoon = moonMasters[terminalNode.displayPlanetInfo];
 

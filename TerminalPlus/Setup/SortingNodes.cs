@@ -5,6 +5,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Text;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TerminalPlus
 {
@@ -21,6 +22,7 @@ namespace TerminalPlus
         // By Weather: moonsList.Sort((x, y) => x.currentWeather.CompareTo(y.currentWeather));
 
         public static readonly Terminal terminal = UnityEngine.Object.FindAnyObjectByType<Terminal>();
+        public static readonly ScrollRect scrollRect = UnityEngine.Object.FindAnyObjectByType<ScrollRect>();
         private static string[] nounTPList = new string[0];
 
         public static int dayPowerMult = 0;

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
@@ -52,9 +50,9 @@ namespace TerminalPlus
         public static TerminalNode[] confirmNodes = Resources.FindObjectsOfTypeAll<TerminalNode>().Where((TerminalNode k) => k.buyRerouteToMoon >= 0).ToArray();
 
         public static string catalogueSort = "   DEFAULT ⇩";
-        
 
         public static ManualLogSource mls = BepInEx.Logging.Logger.CreateLogSource("TerminalPlus");
+
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
@@ -63,8 +61,9 @@ namespace TerminalPlus
         {
             List<int> IDChecker = new List<int>();
             List<SelectableLevel> errorArray = new List<SelectableLevel>();
-            routeNouns = terminal.terminalNodes.allKeywords[26].compatibleNouns;
-            //moonsList.Clear();
+
+            routeNouns = terminal.terminalNodes.allKeywords[27].compatibleNouns;
+
             moonMasters.Clear();
             moonsList = Resources.FindObjectsOfTypeAll<SelectableLevel>().ToList();
 
@@ -82,6 +81,12 @@ namespace TerminalPlus
                     errorArray.Add(selectableLevel);
                     continue;
                 }
+                else if (selectableLevel.PlanetName.ToLower().Contains("liquidation"))
+                {
+                    mls.LogInfo($"Moon \"{selectableLevel.PlanetName}\" is unreleased. Removing...");
+                    errorArray.Add(selectableLevel);
+                    continue;
+                }
                 IDChecker.Add(selectableLevel.levelID);
                 moonMasters.Add(selectableLevel.levelID, new MoonMaster(selectableLevel));
             }
@@ -94,9 +99,6 @@ namespace TerminalPlus
                 moonsList.Remove(errorArray[i]);
                 UnityEngine.Object.Destroy(errorArray[i]);
             }
-            mls.LogWarning("  moonlist length: " + moonsList.Count);
-            mls.LogWarning("masterlist length: " + moonMasters.Count);
-            //Array.Resize(ref moonsPrice, moonMasters.Count);
             IDChecker.Clear();
 
             foreach (MoonMaster moonFP in moonMasters.Values)
@@ -112,15 +114,11 @@ namespace TerminalPlus
             }
         }
 
-
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
         [HarmonyPriority(3)]
         public static void NameSeparator()
-        {
-            //moonNames.Clear();
-            //moonPrefixes.Clear();
-            
+        {   
             foreach (MoonMaster moonNS in moonMasters.Values)
             {
                 if (!char.IsDigit(moonNS.origName.First())) moonNS.mName = moonNS.origName;
@@ -131,7 +129,6 @@ namespace TerminalPlus
                 }
             }
         }
-
 
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPostfix]
@@ -153,7 +150,6 @@ namespace TerminalPlus
 
                 if (moonMCS.mGrade.ToLower() == "unknown") moonMCS.dispGrade = " ?? ";
                 else moonMCS.dispGrade = moonMCS.mGrade.Length <= 2 || moonMCS.mGrade == "Safe" ? moonMCS.mGrade.PadRight(3).PadLeft(4) : moonMCS.mGrade.Substring(0, 2).PadRight(3).PadLeft(4);
-                //moonMCS.dispGrade = moonMCS.dispGrade.Length <= 2 || moonMCS.dispGrade == "Safe" ? moonMCS.dispGrade.PadRight(3).PadLeft(4) : moonMCS.dispGrade.Substring(0, 2).PadRight(3).PadLeft(4);
 
                 if (moonMCS.mLevelName == "CompanyBuildingLevel" && moonMCS.mName == "Company Building") moonMCS.dispName = "Company<space=0.3en>Building<space=-0.3en>";
             }
@@ -225,6 +221,7 @@ namespace TerminalPlus
                     catalogueSort = "   DEFAULT ⇩";
                     break;
             }
+
             mls.LogDebug("SETUP END");
 
             return;
