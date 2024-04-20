@@ -24,7 +24,7 @@ namespace TerminalPlus
         [HarmonyPostfix]
         public static void Ssdfdwesasd(float input, bool sendCallback)
         {
-            if (terminal.terminalInUse)
+            if (terminal != null && terminal.terminalInUse)
             {
                 StackTrace stackTrace = new StackTrace();
 
@@ -39,7 +39,7 @@ namespace TerminalPlus
         [HarmonyPostfix]
         public static void TUPatch(ref float ___timeSinceLastKeyboardPress, Terminal __instance)
         {
-            if (terminal.terminalInUse)
+            if (__instance.terminalInUse)
             {
                 __instance.scrollBarCanvasGroup.alpha = 1;
                 terminalKeyPressed = ___timeSinceLastKeyboardPress < 0.08;
@@ -68,7 +68,7 @@ namespace TerminalPlus
         [HarmonyPostfix]
         public static void ScrollTest(Vector2 offset, ref Bounds ___m_ContentBounds, ref Bounds ___m_ViewBounds, ref RectTransform ___m_Content, ref Vector2 ___m_PrevPosition, ScrollRect __instance)
         {
-            if (terminal.terminalInUse)
+            if (terminal != null && terminal.terminalInUse)
             {
                 __instance.verticalScrollbarVisibility = ScrollbarVisibility.AutoHideAndExpandViewport;
 

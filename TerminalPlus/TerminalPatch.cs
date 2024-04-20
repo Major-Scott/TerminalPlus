@@ -33,6 +33,7 @@ namespace TerminalPlus
         [HarmonyPriority(Priority.First)]
         public static void PatchHelpPage(Terminal __instance)
         {
+            terminal = __instance;
             //terminal.terminalNodes.specialNodes[13].displayText = new Nodes().MainHelpPage();
             //terminal.screenText.caretBlinkRate = 1f; //__instance.screenText.caretBlinkRate = 1f;
             __instance.scrollBarCanvasGroup.transform.localPosition = new Vector3(246, 196.5f, 0); // default: 245ish, 208ish, 0
