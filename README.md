@@ -34,8 +34,6 @@ Overhauls the terminal and allows you to customize many aspects of moons includi
 ### General Settings:
 - **Set Default Sorting** for the moon catalogue. Options are "default" (level ID), "name", "prefix", "grade/hazard level", "price", "weather", "difficulty" (equation soon to be customizable, NOT the same as grade), or the reverse of any of them.
 
-- **Hide the Company**, A.K.A "71 Gordion", from the moon catalogue. On by default.
-
 - **Pad Prefixes** with zeroes for a more uniform look. For example, "8 Titan", "21 Offense", and "220 Assurance" would become "008 Titan", "021 Offense", and "220 Assurance".
 
 - **Show Clear Weather** in the moon catalogue. If false, the "weather" section of moons with no current weather will be left blank.
@@ -54,8 +52,16 @@ Possible Variables:
     - Current Weather
     - Average Scrap Value
 
+- **Set the Scroll Sensitivity** for the terminal menus. The value roughly equates to lines scrolled per scroll step.
+
+- **Change the Clock Setting** for the in-terminal clock. Can be changed between "normal/full", "hour only", "military time", and "off".
+
+- **Show LGU Upgrades in the Main Store** along with the LGU store, though this became obsolete five minutes after I implemented it since LGU's store got a complete redesign.
+
 ### Moon Settings:
 - **Enable the Moon Config** for the current moon.
+
+- **Hide the Moon** from the catalogue page (will remain active and usable). On for The Company Building by default.
 
 - **Set a Custom Name** for the moon.
 
@@ -71,12 +77,20 @@ Possible Variables:
 
 ### Misc. Settings:
 
-- **Kilroy was here.**
+- ***Kilroy was here.***
+
+***
+
+## Possible Future Plans (will be a long ways out if they happen)
+- Custom (and configurable) bestiary entries
+- Selectable terminal menus à la AdvancedCompany or the new LateGameUpgrades store? (only if a lot of people want it)
+- Separate mod "Super Company Creator" (or some other equally cheesy name) that lets you build and customize your own terminal pages.
+- Some terminal games?
 
 ***
 
 # CREDITS
 
-mrov for their [TerminalFormatter](https://thunderstore.io/c/lethal-company/p/mrov/TerminalFormatter/) mod that inspired me
+mrov for their [TerminalFormatter](https://thunderstore.io/c/lethal-company/p/mrov/TerminalFormatter/) mod that inspired me and for some compatibility help
 
 IAmBatby for [LethalLevelLoader](https://thunderstore.io/c/lethal-company/p/IAmBatby/LethalLevelLoader/) which I used for testing
