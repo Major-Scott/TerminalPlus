@@ -65,8 +65,6 @@ namespace TerminalPlus
             string currentTime = __instance.clockNumber.text != null ? __instance.clockNumber.text : string.Empty;
             numTime = currentTime.Substring(0, currentTime.IndexOf(':'));
 
-            mls.LogInfo(terminal.topRightText.transform.parent.childCount);
-
             switch (ConfigManager.clockSetting)
             {
                 case 0:
