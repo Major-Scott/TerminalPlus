@@ -95,9 +95,7 @@ namespace TerminalPlus
 
             for(int i = errorArray.Count - 1; i >= 0; i--)
             {
-                mls.LogWarning("destroying dupe: " + errorArray[i].name);
                 moonsList.Remove(errorArray[i]);
-                UnityEngine.Object.Destroy(errorArray[i]);
             }
             IDChecker.Clear();
 
